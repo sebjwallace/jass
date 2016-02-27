@@ -79,3 +79,24 @@ Either require or link ReactRSS.js then just extend it like you would with React
   	}
   }
 ```
+
+If you want to use mixins declare them wherever you have access to RSS.
+
+```
+RSS.mixin('border-radius',function(radius){
+return {
+	'-webkit-border-radius': radius,
+     '-moz-border-radius': radius,
+      '-ms-border-radius': radius,
+          'border-radius': radius
+    }
+});
+```
+
+Then include them by prefixing the attribute with @ and supplying the variable value.
+
+```
+.myClass{
+  '@border-radius': '5px'
+}
+```
