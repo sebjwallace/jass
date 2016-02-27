@@ -19,11 +19,15 @@ class RSS extends React.Component{
 		var sum = "";
 		var stitch = function(obj){
 			for(var props in obj){
-				sum += props;
-				if(typeof obj[props] === 'object'){
-					sum+="{"; stitch(obj[props]); sum+="}";
+				if (props.match(/^\@[a-z&\-]+$/g)){
+					stitch(RSS.getMixin(props.replace('@',''),obj[props]));
 				} else{
-					sum+= ":" + obj[props] + ";";
+					sum += props;
+					if(typeof obj[props] === 'object'){
+						sum+="{"; stitch(obj[props]); sum+="}";
+					} else{
+						sum+= ":" + obj[props] + ";";
+					}
 				}
 			}
 		}
@@ -49,5 +53,12 @@ class RSS extends React.Component{
 		el.innerHTML = styles;
 	}
 };
+RSS.mixin = (id,fn) => {
+	RSS.mixins[id] = fn;
+}
+RSS.getMixin = (id,params) => {
+	return RSS.mixins[id](params);
+}
+RSS.mixins = {};
 
 module.exports = RSS;
