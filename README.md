@@ -11,17 +11,20 @@ RSS is also SASSy, in that you can write your styles similar to SASS or LESS. Be
 ####The Basics
 
 ```
+var defaultWidth = 50;
+
 setStyles({
   '.myClass': {
     position: 'relative',
-    width: '50%'
+    width: defaultWidth + '%', // variable
+    '> hover': { // nesting
+        'background-color': 'rgb(240,120,180)',
+        '@bordered-blue': '2px' // mixin
+    }
   },
-  '.myClass :hover': {
-    'background-color': 'rgb(240,120,180)'
-  },
-  "@media screen and (max-width: 960px)":{
+  '@media screen and (max-width: 960px)':{ // media query
     '.myClass': {
-      width: '100%'
+      width: defaultWidth + '%'
     }
   }
 });
