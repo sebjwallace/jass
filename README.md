@@ -10,7 +10,7 @@ RSS is also SASSy, in that you can write your styles similar to SASS or LESS. Be
 
 ####The Basics
 
-```
+```javascript
 var defaultWidth = 50;
 
 setStyles({
@@ -24,7 +24,7 @@ setStyles({
   },
   '@media screen and (max-width: 960px)':{ // media query
     '.myClass': {
-      width: defaultWidth + '%'
+      width: defaultWidth * 2 + '%'
     }
   }
 });
@@ -32,7 +32,7 @@ setStyles({
 
 RSS becomes reactive when using JS varibles in the style properties.
 
-```
+```javascript
 setStyles({
   '.myClass':{
     width: this.state.width * 2 + "px"
@@ -42,7 +42,7 @@ setStyles({
 
 When using ES6 you can always just use template strings.
 
-```
+```javascript
 setStyles(`
   .myClass{
     width: ${ this.state.width * 2 }px
@@ -52,7 +52,7 @@ setStyles(`
 
 Either require or link ReactRSS.js then just extend it like you would with React.Component
 
-```
+```javascript
   let RSS = require('./ReactRSS');
   
   class MyComponent extends ReactRSS{
@@ -90,7 +90,7 @@ Either require or link ReactRSS.js then just extend it like you would with React
 
 If you want to use mixins declare them wherever you have access to RSS.
 
-```
+```javascript
 let RSS = require('./ReactRSS');
 
 RSS.mixin('border-radius',function(radius){
@@ -105,7 +105,7 @@ return {
 
 Then include them by prefixing the attribute with @ and supplying the variable value.
 
-```
+```javascript
 .myClass: {
   '@border-radius': '5px'
 }
@@ -115,7 +115,7 @@ Then include them by prefixing the attribute with @ and supplying the variable v
 
 To nest selectors just prefix the selector with '> ':
 
-```
+```javascript
 .myClass: {
     '> li': {
     	'padding' : '10px',
