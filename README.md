@@ -110,7 +110,7 @@ Then include them by prefixing the attribute with @ and supplying the variable v
 
 #### Nesting
 
-To nest selectors just prefix the selector with '>':
+To nest selectors just prefix the selector with '> ':
 
 ```
 .myClass: {
