@@ -16,11 +16,18 @@ class RSS extends React.Component{
 		this.rendered ? this.updateCSS(styles) : this.renderCSS(styles)
 	}
 	parseOBJ(obj){
+		var post = {};
+		var parent = '';
 		var sum = "";
 		var stitch = function(obj){
 			for(var props in obj){
-				if (props.match(/^\@[a-z&\-]+$/g)){
+				if(props.match(/^(\#|\.)[a-z&\-]+$/)){
+					parent = props;
+				}
+				if (props.match(/^\@[a-z&\-]+$/)){
 					stitch(RSS.getMixin(props.replace('@',''),obj[props]));
+				} else if (props.match(/^\>\s[a-z]+$/)){
+					post[parent + " " + props.replace('> ','')] = obj[props];
 				} else{
 					sum += props;
 					if(typeof obj[props] === 'object'){
@@ -32,6 +39,7 @@ class RSS extends React.Component{
 			}
 		}
 		stitch(obj);
+		stitch(post);
 		return sum;
 	}
 	renderCSS(styles){
