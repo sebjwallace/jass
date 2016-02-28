@@ -90,12 +90,14 @@ Either require or link ReactRSS.js then just extend it like you would with React
 
 If you want to use mixins declare them wherever you have access to RSS.
 
+*note: mixins must be declared before they are mixed-in! This is important to note when sharing across components.*
+
 ```javascript
 let RSS = require('./ReactRSS');
 
 RSS.mixin('border-radius',function(radius){
 return {
-	'-webkit-border-radius': radius,
+  '-webkit-border-radius': radius,
      '-moz-border-radius': radius,
       '-ms-border-radius': radius,
           'border-radius': radius
@@ -128,9 +130,9 @@ To nest selectors just prefix the selector with '> ':
 
 #### Inheritance
 
-For now parent selectors must be declared/exported before being consumed/imported by any child selectors. This means that the parent declaration must be loaded before it is used by any child selectors.
-
 To import styles use a '@import' attribute and the name of the selector as the value.
+
+*note: exports must be declared before they are imported! This is important to note when sharing across components.*
 
 ```javascript
     let RSS = require('./ReactRSS');
