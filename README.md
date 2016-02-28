@@ -24,7 +24,7 @@ setStyles({
   },
   '@media screen and (max-width: 960px)':{ // media query
     '.myClass': {
-      width: defaultWidth * 2 + '%'
+      width: defaultWidth * 2 + '%' // use regular JS expressions
     }
   }
 });
@@ -125,3 +125,27 @@ To nest selectors just prefix the selector with '> ':
     }
 }
 ```
+
+#### Inheritance
+
+For now parent selectors must be declared/exported before being consumed/imported by any child selectors. This means that the parent declaration must be loaded before it is used by any child selectors.
+
+To import styles use a '@import' attribute and the name of the selector as the value.
+
+```javascript
+    let RSS = require('./ReactRSS');
+    
+    RSS.export('.success', {
+        color: '#fff',
+    	'background-color': '#5cb85c',
+    	'border-color': '#4cae4c'
+    });
+    
+    // ...then inside the setStyles() call in a component somewhere
+    
+    '#message': {
+    	'@import': '.success',
+    	'font-size': 1.2 + 'em'
+    }
+```
+
