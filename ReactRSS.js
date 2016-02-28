@@ -17,17 +17,22 @@ class RSS extends React.Component{
 	}
 	parseOBJ(obj){
 		var post = {};
-		var parent = '';
+		var parentID = '';
+		var parentOBJ = {};
 		var sum = "";
 		var stitch = function(obj){
 			for(var props in obj){
+
 				if(props.match(/^(\#|\.)[a-z&\-]+$/)){
-					parent = props;
+					parentID = props; parentOBJ = obj[props];
 				}
-				if (props.match(/^\@[a-z&\-]+$/)){
+
+				if(props.match(/\@import/)){ // import
+					post[obj[props] + ", " + parentID] = RSS.getSelector(obj[props]);
+				} else if (props.match(/^\@[a-z&\-]+$/)){ // mixin
 					stitch(RSS.getMixin(props.replace('@',''),obj[props]));
-				} else if (props.match(/^\>\s[a-z]+$/)){
-					post[parent + " " + props.replace('> ','')] = obj[props];
+				} else if (props.match(/^\>\s[a-z]+$/)){ // nesting
+					post[parentID + " " + props.replace('> ','')] = obj[props];
 				} else{
 					sum += props;
 					if(typeof obj[props] === 'object'){
@@ -61,6 +66,15 @@ class RSS extends React.Component{
 		el.innerHTML = styles;
 	}
 };
+
+RSS.export = (id,obj) => {
+	RSS.selectors[id] = obj;
+}
+RSS.getSelector = (id) => {
+	return RSS.selectors[id];
+}
+RSS.selectors = {};
+
 RSS.mixin = (id,fn) => {
 	RSS.mixins[id] = fn;
 }
