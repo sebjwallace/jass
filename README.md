@@ -4,7 +4,11 @@
 #### CSS for React.js
 ---
 
-When encapsulating HTML, CSS & JS into a React component, the CSS is usually defined inline the element's style tag. The limitations of this approach is the inability for styles to react to browser events and media queries. RSS brings back the ability to write style sheets inside the component using a single method.
+When encapsulating HTML, CSS & JS into a React component, the CSS is usually defined inline the element's style tag. The limitations of this approach is the inability for styles to react to browser events and media queries. RSS brings back the ability to write style sheets inside the component.
+
+RSS is also SASSy, in that you can write your styles similar to SASS or LESS. Being that RSS exists in a JS environment, most of the features come free out-the-box. But RSS impliments the following features: mixins, nesting and inheritance.
+
+####The Basics
 
 ```
 setStyles({
@@ -79,10 +83,13 @@ Either require or link ReactRSS.js then just extend it like you would with React
   	}
   }
 ```
+#### Mixins
 
 If you want to use mixins declare them wherever you have access to RSS.
 
 ```
+let RSS = require('./ReactRSS');
+
 RSS.mixin('border-radius',function(radius){
 return {
 	'-webkit-border-radius': radius,
@@ -96,7 +103,22 @@ return {
 Then include them by prefixing the attribute with @ and supplying the variable value.
 
 ```
-.myClass{
+.myClass: {
   '@border-radius': '5px'
+}
+```
+
+#### Nesting
+
+To nest selectors just prefix the selector with '>':
+
+```
+.myClass: {
+    '> li': {
+    	'padding' : '10px',
+    	'> :hover': {
+    	    border: '2px solid red'
+    	}
+    }
 }
 ```
