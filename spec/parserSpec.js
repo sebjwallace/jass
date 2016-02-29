@@ -1,5 +1,5 @@
 var Parser = require('../src/Parser');
-
+var Store = require('../src/Store');
 
 describe('parser', function(){
 
@@ -26,11 +26,65 @@ describe('parser', function(){
 		expect(CSSString).toBe('#myId{height:20px;width:40px;}');
 	});
 
-	it('finds @import expressions', function(){
+	it('will not register @media queries as selectors', function(){
 		var CSSString = parser.parse({
-			'#myId': {'@import': '.myClass'}
+			'@media screen and (min-width: 760px)': { body: {} }
 		});
-		expect(CSSString).toBe('#myId{height:20px;}');
+		expect(CSSString).toBe('@media screen and (min-width: 760px){body{}}');
+	});
+
+	it('will parse @mixins', function(){
+		var store = new Store();
+		store.setMixin('border-radius',function(radius){
+			return { 'border-radius': radius }
+		});
+		var parser = new Parser(store);
+		var CSSString = parser.parse({
+			'#myId': { '@border-radius' : '5px' }
+		});
+		expect(CSSString).toBe('#myId{border-radius:5px;}');
+	});
+
+	it('will parse @import', function(){
+		var store = new Store();
+		store.setSelector('.greenColor',{
+			color : 'green' 
+		});
+		var parser = new Parser(store);
+		var CSSString = parser.parse({
+			'#myId': {
+				'@import': '.greenColor',
+				'font-size': '2em'
+			} 
+		});
+		expect(CSSString).toBe('#myId{font-size:2em;}.greenColor, #myId{color:green;}');
+	});
+
+	it('will parse > nestings', function(){
+		var CSSString = parser.parse({
+			'#myId': {
+				'> li': {
+					color: 'green'
+				},
+				'font-size': '2em'
+			} 
+		});
+		expect(CSSString).toBe('#myId{font-size:2em;}#myId li{color:green;}');
+	});
+
+	it('will parse deep > nestings', function(){
+		var CSSString = parser.parse({
+			'#myId': {
+				'> li': {
+					color: 'green',
+					'> a': {
+						color: 'blue'
+					}
+				},
+				'font-size': '2em'
+			} 
+		});
+		expect(CSSString).toBe('#myId{font-size:2em;}#myId li{color:green;}#myId li a{color:blue;}');
 	});
 
 
