@@ -14,12 +14,14 @@ module.exports = function () {
 },{}],2:[function(require,module,exports){
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 module.exports = function (store) {
 
 	this.store = store;
 
-	this.isSelector = function (check) {
-		return check.match(/^(\#|\.)[a-z&\-]+$/);
+	this.isMediaQuery = function (check) {
+		return check.match(/\@media/);
 	};
 
 	this.isImport = function (check) {
@@ -37,24 +39,34 @@ module.exports = function (store) {
 	this.parse = function (obj) {
 		var self = this;
 
-		var post = {};
+		var stack = [];
 		var parentID = '';
 		var parentOBJ = {};
 		var sum = "";
 
+		// keep track of recursion level
+		// level 1 keys are selectors
+		var level = 0;
+
 		var stitch = function stitch(obj) {
+
+			level++;
+
 			for (var props in obj) {
 
-				if (self.isSelector(props)) {
-					parentID = props;parentOBJ = obj[props];
+				if (level == 1 && !self.isMediaQuery(props)) {
+					parentID = props;
+					parentOBJ = obj[props];
 				}
 
 				if (self.isImport(props)) {
-					post[obj[props] + ", " + parentID] = self.store.getSelector(obj[props]);
+					var item = _defineProperty({}, obj[props] + ", " + parentID, self.store.getSelector(obj[props]));
+					stack.push(item);
 				} else if (self.isMixin(props)) {
 					stitch(self.store.getMixin(props.replace('@', ''), obj[props]));
 				} else if (self.isNesting(props)) {
-					post[parentID + " " + props.replace('> ', '')] = obj[props];
+					var item = _defineProperty({}, parentID + " " + props.replace('> ', ''), obj[props]);
+					stack.push(item);
 				} else {
 					sum += props;
 					if (typeof obj[props] === 'object') {
@@ -66,10 +78,17 @@ module.exports = function (store) {
 					}
 				}
 			}
+
+			level--;
 		};
 
 		stitch(obj);
-		stitch(post);
+
+		var len = stack.length;
+		for (var i = 0; i < len; i++) {
+			stitch(stack[i]);
+			len = stack.length;
+		}
 
 		return sum;
 	};
