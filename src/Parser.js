@@ -1,4 +1,6 @@
-module.exports = function(){
+module.exports = function(store){
+
+	this.store = store;
 
 	this.isSelector = function(check){
 		return check.match(/^(\#|\.)[a-z&\-]+$/);
@@ -32,10 +34,10 @@ module.exports = function(){
 				}
 
 				if(self.isImport(props)){
-					post[obj[props] + ", " + parentID] = RSS.getSelector(obj[props]);
+					post[obj[props] + ", " + parentID] = self.store.getSelector(obj[props]);
 				}
 				else if(self.isMixin(props)){
-					stitch(RSS.getMixin(props.replace('@',''),obj[props]));
+					stitch(self.store.getMixin(props.replace('@',''),obj[props]));
 				}
 				else if (self.isNesting(props)){
 					post[parentID + " " + props.replace('> ','')] = obj[props];

@@ -1,50 +1,21 @@
-var Parser = require('./Parser');
-var Keygen = require('./Keygen');
+var RSS = require('./RSS');
 
-class RSS extends React.Component{
+class ReactRSS extends React.Component{
 	constructor(props){
 		super(props)
-		this.key = new Keygen().generate(5);
-		this.rendered = false;
+		this.RSS = new RSS();
 	}
 	setStyles(styles){
-		if (typeof styles === 'object') styles = new Parser().parse(styles);
-		this.rendered ? this.updateCSS(styles) : this.renderCSS(styles);
-	}
-	renderCSS(styles){
-		let el = document.createElement('style');
-		el.id = "react-styles-" + this.key;
-		document.body.insertBefore(el,document.body.lastChild);
-
-		if(styles){
-			let initialStylesEl = document.createElement('style');
-			initialStylesEl.id = "react-styles-initial-" + this.key;
-			initialStylesEl.innerHTML = styles;
-			document.body.insertBefore(initialStylesEl,document.body.lastChild);
-		}
-
-		this.rendered = true;
-	}
-	updateCSS(styles){
-		let el = document.getElementById('react-styles-' + this.key);
-		el.innerHTML = styles;
+		this.RSS.setStyles(styles);
 	}
 };
 
-RSS.export = (id,obj) => {
-	RSS.selectors[id] = obj;
+ReactRSS.mixin = (id,fn) => {
+	RSS.mixin(id,fn);
 }
-RSS.getSelector = (id) => {
-	return RSS.selectors[id];
-}
-RSS.selectors = {};
 
-RSS.mixin = (id,fn) => {
-	RSS.mixins[id] = fn;
+ReactRSS.export = (id,obj) => {
+	RSS.export(id,obj);
 }
-RSS.getMixin = (id,params) => {
-	return RSS.mixins[id](params);
-}
-RSS.mixins = {};
 
-module.exports = RSS;
+module.exports = ReactRSS;

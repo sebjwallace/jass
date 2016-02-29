@@ -1,5 +1,6 @@
 var Parser = require('../src/Parser');
 
+
 describe('parser', function(){
 
 	var parser = new Parser();
@@ -23,6 +24,13 @@ describe('parser', function(){
 			}
 		});
 		expect(CSSString).toBe('#myId{height:20px;width:40px;}');
+	});
+
+	it('finds @import expressions', function(){
+		var CSSString = parser.parse({
+			'#myId': {'@import': '.myClass'}
+		});
+		expect(CSSString).toBe('#myId{height:20px;}');
 	});
 
 
