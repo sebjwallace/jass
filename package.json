@@ -1,31 +1,26 @@
 {
-  "name": "react-rss",
+  "name": "sebjwallace_website",
   "version": "1.0.0",
-  "description": "Reactive Stylesheets for React.js",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine-node spec"
+    "test": "jasmine-node spec & gulp test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sebjwallace/react-rss.git"
-  },
-  "keywords": [
-    "css",
-    "style",
-    "react"
-  ],
-  "author": "Sebastian Wallace",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/sebjwallace/react-rss/issues"
+  "dependencies": {
+    "font-awesome": "^4.5.0",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7"
   },
-  "homepage": "https://github.com/sebjwallace/react-rss#readme",
   "devDependencies": {
-    "browserify": "^13.0.0",
     "babelify": "^6.0.2",
+    "browserify": "^13.0.0",
     "gulp": "^3.9.1",
+    "gulp-open": "^1.0.0",
     "gulp-uglify": "^1.5.3",
+    "jasmine-core": "^2.4.1",
+    "opn": "^4.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

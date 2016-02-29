@@ -78,13 +78,35 @@ describe('parser', function(){
 				'> li': {
 					color: 'green',
 					'> a': {
+						'> i': {
+							'font-size': '1em'
+						},
 						color: 'blue'
 					}
 				},
 				'font-size': '2em'
 			} 
 		});
-		expect(CSSString).toBe('#myId{font-size:2em;}#myId li{color:green;}#myId li a{color:blue;}');
+		expect(CSSString).toBe('#myId{font-size:2em;}#myId li{color:green;}#myId li a{color:blue;}#myId li a i{font-size:1em;}');
+
+		var CSSString = parser.parse({
+			'#myId': {
+				'> li': {
+					color: 'green',
+					'> a': {
+						color: 'blue'
+					},
+					'> :hover': {
+						'font-size': '1em'
+					}
+				},
+				'> .messages': {
+					'font-size': '0.5em'
+				},
+				'font-size': '2em'
+			}
+		});
+		expect(CSSString).toBe('#myId{font-size:2em;}#myId li{color:green;}#myId .messages{font-size:0.5em;}#myId li a{color:blue;}#myId li :hover{font-size:1em;}');
 	});
 
 

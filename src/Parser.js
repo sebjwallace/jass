@@ -15,7 +15,7 @@ module.exports = function(store){
 	}
 
 	this.isNesting = function(check){
-		return check.match(/^\>\s[a-z]+$/);
+		return check.match(/^\>\s[^]+$/);
 	}
 
 	this.parse = function(obj){

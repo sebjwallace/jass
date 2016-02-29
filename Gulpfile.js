@@ -1,26 +1,49 @@
+var gulp = require('gulp');
 var browserify = require('browserify');
 var babelify = require('babelify');
-var gulp = require('gulp');
 var uglify = require('gulp-uglify');
-var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
+var source = require('vinyl-source-stream');
+var open = require('opn');
 
-gulp.task('default', ['dev','dist']);
+gulp.task('test', function(){
+    console.log('opening tests/index.html');
+    open('./tests/index.html',{ app: 'chrome' });
+});
 
-gulp.task('dev', function() {
-  return browserify('./src/ReactRSS.js')
+gulp.task('es6', function() {
+	browserify({
+    	entries: 'src/rss.js',
+    	debug: true
+  	})
     .transform(babelify)
     .bundle()
-    .pipe(source('react-rss.js'))
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest(''));
+});
+
+gulp.task('dev', function() {
+  return browserify('./src/RSS.js',{
+        standalone: 'RSS'
+    })
+    .transform(babelify)
+    .bundle()
+    .pipe(source('rss.js'))
     .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('dist', function() {
-  return browserify('./src/ReactRSS.js')
+  return browserify('./src/RSS.js',{
+        standalone: 'RSS'
+    })
     .transform(babelify)
     .bundle()
-    .pipe(source('react-rss.min.js'))
+    .pipe(source('rss.min.js'))
     .pipe(buffer())
     .pipe(uglify())
     .pipe(gulp.dest('./dist'));
 });
+
+//gulp.task('default', ['es6']);
+
+gulp.task('default', ['dev','dist']);
