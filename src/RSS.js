@@ -11,15 +11,15 @@ var RSS = function(){
 		self.rendered = false;
 	}
 	var renderCSS = function(styles){
-		self.dom.createStyleTag("rss-" + self.key);
+		self.dom.createStyleTag(self.getIds('reactive'));
 
 		if(styles)
-			self.dom.createStyleTag("rss-initial-" + self.key,styles);
+			self.dom.createStyleTag(self.getIds('initial'),styles);
 
 		self.rendered = true;
 	}
 	var updateCSS = function(styles){
-		self.dom.updateStyleTag('rss-styles-' + self.key, styles);
+		self.dom.updateStyleTag(self.getIds('reactive'), styles);
 	}
 	this.setStyles = function(styles,returnAsString){
 		if (typeof styles === 'object') styles = new Parser(RSS.store).parse(styles);
@@ -27,6 +27,12 @@ var RSS = function(){
 			self.rendered ? updateCSS(styles) : renderCSS(styles);
 		else
 			return styles;
+	}
+	this.export = function(id,obj){
+		RSS.export(id,obj);
+	}
+	this.mixin = function(id,fn){
+		RSS.mixin(id,fn);
 	}
 	this.getIds = function(select){
 		var ids = {
