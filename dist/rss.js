@@ -1,201 +1,397 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.RSS = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-module.exports = function () {
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
 
-	this.createStyleTag = function (id, content) {
-		var el = window.document.createElement('style');
-		el.id = id;
-		if (content) el.innerHTML = content;
-		window.document.body.insertBefore(el, window.document.body.lastChild);
-	};
-
-	this.updateStyleTag = function (id, content) {
-		var el = window.document.getElementById(id);
-		el.innerHTML = content;
-	};
-};
-
-},{}],2:[function(require,module,exports){
-"use strict";
-
-module.exports = function () {
-	this.generate = function (length) {
-		var key = "";
-		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		for (var i = 0; i < length; i++) key += possible.charAt(Math.floor(Math.random() * possible.length));
-		return key;
-	};
-	return this;
-};
-
-},{}],3:[function(require,module,exports){
-"use strict";
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-module.exports = function (store) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	this.store = store;
+var Compiler = (function () {
+	function Compiler(Store) {
+		_classCallCheck(this, Compiler);
 
-	this.isMediaQuery = function (check) {
-		return check.match(/\@media/);
-	};
+		this.Store = Store;
+	}
 
-	this.isImport = function (check) {
-		return check.match(/\@import/);
-	};
+	_createClass(Compiler, [{
+		key: 'isMediaQuery',
+		value: function isMediaQuery(check) {
+			return check.match(/\@media/);
+		}
+	}, {
+		key: 'isExtend',
+		value: function isExtend(check) {
+			return check.match(/^\@extend($|[0-9])/);
+		}
+	}, {
+		key: 'isMixin',
+		value: function isMixin(check) {
+			return check.match(/^\@mixin\s/);
+		}
+	}, {
+		key: 'isNesting',
+		value: function isNesting(check) {
+			return check.match(/^\>\s[^]+$/);
+		}
+	}, {
+		key: 'generateSelector',
+		value: function generateSelector(selector, scope) {
+			//if (this.isMediaQuery(selector)) return selector;
+			var children = '';
+			var check = selector.match(/^[^\s]+/)[0];
+			var postfixes = selector.replace(/^[^\s]+/, '');
+			if (this.Store.styles[check]) for (var child in this.Store.styles[check].children) {
+				children += this.Store.styles[check].children[child] + ' ' + postfixes + ', ';
+			}
+			return children + ' ' + '.' + scope + ' ' + selector;
+		}
+	}, {
+		key: 'parse',
+		value: function parse(obj, scope) {
+			var _this = this;
 
-	this.isMixin = function (check) {
-		return check.match(/^\@[a-z&\-]+$/);
-	};
+			var scope = scope;
+			var parentID = '';
+			var parentOBJ = {};
+			var stack = [];
 
-	this.isNesting = function (check) {
-		return check.match(/^\>\s[^]+$/);
-	};
+			var sum = "";
+			var extensions = {};
 
-	this.parse = function (obj) {
-		var self = this;
+			// keep track of recursion level
+			// level 1 keys are selectors
+			var level = 0;
 
-		var stack = [];
-		var parentID = '';
-		var parentOBJ = {};
-		var sum = "";
+			var stitch = function stitch(obj) {
 
-		// keep track of recursion level
-		// level 1 keys are selectors
-		var level = 0;
+				level++;
 
-		var stitch = function stitch(obj) {
+				for (var props in obj) {
 
-			level++;
-
-			for (var props in obj) {
-
-				if (level == 1 && !self.isMediaQuery(props)) {
-					parentID = props;
-					parentOBJ = obj[props];
-				}
-
-				if (self.isImport(props)) {
-					var item = _defineProperty({}, obj[props] + ", " + parentID, self.store.getSelector(obj[props]));
-					stack.push(item);
-				} else if (self.isMixin(props)) {
-					stitch(self.store.getMixin(props.replace('@', ''), obj[props]));
-				} else if (self.isNesting(props)) {
-					var item = _defineProperty({}, parentID + " " + props.replace('> ', ''), obj[props]);
-					stack.push(item);
-				} else {
-					sum += props;
-					if (typeof obj[props] === 'object') {
-						sum += "{";
-						stitch(obj[props]);
-						sum += "}";
-					} else {
-						sum += ":" + obj[props] + ";";
+					if (level == 1 && !_this.isMediaQuery(props)) {
+						parentID = props;
+						parentOBJ = obj[props];
 					}
+
+					if (_this.isMixin(props)) {
+						if (typeof obj[props] == 'string') {
+							var key = _this.Store.mixins[props.replace('@mixin ', '')];
+							stitch(key(obj[props]));
+						}
+					} else if (_this.isNesting(props)) {
+						var item = _defineProperty({}, parentID + " " + props.replace('> ', ''), obj[props]);
+						stack.push(item); // the item could have children + parentId with a keyword to replace with the postfixes
+					} else if (_this.isExtend(props)) continue;else {
+							if (typeof obj[props] === 'object') {
+								sum += _this.generateSelector(props, scope);
+								sum += "{";
+								stitch(obj[props]);
+								sum += "}";
+							} else {
+								sum += props;
+								sum += ":" + obj[props] + ";";
+							}
+						}
 				}
+
+				level--;
+			};
+
+			stitch(obj);
+
+			var len = stack.length;
+			for (var i = 0; i < len; i++) {
+				stitch(stack[i]);
+				len = stack.length;
 			}
 
-			level--;
-		};
-
-		stitch(obj);
-
-		var len = stack.length;
-		for (var i = 0; i < len; i++) {
-			stitch(stack[i]);
-			len = stack.length;
+			return sum;
 		}
+	}]);
 
-		return sum;
-	};
+	return Compiler;
+})();
 
-	return this;
-};
+exports.Compiler = Compiler;
 
-},{}],4:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 'use strict';
 
-var Parser = require('./Parser');
-var Keygen = require('./Keygen');
-var Store = require('./Store');
-var DOMBridge = require('./DOMBridge');
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _Token = require('./Token');
+
+var _Store = require('./Store');
+
+var _Tag = require('./Tag');
+
+var Component = (function () {
+	function Component() {
+		_classCallCheck(this, Component);
+
+		this.token = new _Token.Token();
+		this.tag = new _Tag.Tag(this.token.key);
+	}
+
+	_createClass(Component, [{
+		key: 'setStyles',
+		value: function setStyles(obj) {
+			_Store.Store.setStyles(obj, this.token, this.tag);
+		}
+	}, {
+		key: 'getStyleTag',
+		value: function getStyleTag() {
+			return this.tag.getTag();
+		}
+	}, {
+		key: 'getScope',
+		value: function getScope() {
+			return '.' + this.token.key;
+		}
+	}, {
+		key: 'getToken',
+		value: function getToken() {
+			return this.token.key;
+		}
+	}]);
+
+	return Component;
+})();
+
+exports.Component = Component;
+
+},{"./Store":4,"./Tag":6,"./Token":7}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _Component2 = require('./Component');
 
 var RSS = function RSS() {
-	var self = this;
-	self.dom = new DOMBridge();
-	var constructor = function constructor() {
-		self.key = new Keygen().generate(5);
-		self.rendered = false;
-	};
-	var renderCSS = function renderCSS(styles) {
-		self.dom.createStyleTag(self.getIds('reactive'));
+	_classCallCheck(this, RSS);
 
-		if (styles) self.dom.createStyleTag(self.getIds('initial'), styles);
-
-		self.rendered = true;
-	};
-	var updateCSS = function updateCSS(styles) {
-		self.dom.updateStyleTag(self.getIds('reactive'), styles);
-	};
-	this.setStyles = function (styles, returnAsString) {
-		if (typeof styles === 'object') styles = new Parser(RSS.store).parse(styles);
-		if (!returnAsString) self.rendered ? updateCSS(styles) : renderCSS(styles);else return styles;
-	};
-	this['export'] = function (id, obj) {
-		RSS['export'](id, obj);
-	};
-	this.mixin = function (id, fn) {
-		RSS.mixin(id, fn);
-	};
-	this.getIds = function (select) {
-		var ids = {
-			key: self.key,
-			initial: 'rss-initial-' + self.key,
-			reactive: 'rss-' + self.key
-		};
-		if (select) return ids[select];else return ids;
-	};
-	constructor();
+	if (!document.getElementById('rss-container')) {
+		var el = document.createElement('div');
+		el.id = 'rss-container';
+		document.body.appendChild(el);
+	}
 };
 
-RSS.store = new Store();
+var RSSSingleton = new RSS();
 
-RSS['export'] = function (id, obj) {
-	RSS.store.setSelector(id, obj);
-};
-RSS.mixin = function (id, fn) {
-	RSS.store.setMixin(id, fn);
-};
+exports.RSSSingleton = RSSSingleton;
+var Component = _Component2.Component;
+exports.Component = Component;
 
-module.exports = RSS;
+},{"./Component":2}],4:[function(require,module,exports){
+'use strict';
 
-},{"./DOMBridge":1,"./Keygen":2,"./Parser":3,"./Store":5}],5:[function(require,module,exports){
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _Style = require('./Style');
+
+var _Compiler = require('./Compiler');
+
+var StoreSingleton = (function () {
+	function StoreSingleton() {
+		_classCallCheck(this, StoreSingleton);
+
+		this.styles = [];
+		this.tags = {};
+		this.mixins = {};
+		this.mediaQueries = [];
+		this.tokenIndex = {};
+		this.styleIndex = {};
+		this.renderStack = {};
+	}
+
+	_createClass(StoreSingleton, [{
+		key: 'setStyles',
+		value: function setStyles(styles, token, tag) {
+			this.tags[token.key] = tag;
+			this.preCompile(styles, token);
+			this.compile();
+		}
+	}, {
+		key: 'preCompile',
+		value: function preCompile(obj, token) {
+			var _this = this;
+
+			var level = 0;
+			var activeStyle = {};
+
+			var extract = function extract(obj) {
+				level++;
+
+				for (var prop in obj) {
+
+					if (level == 1) {
+						_this.styles[prop] = new _Style.Style(token.key, prop, obj[prop]);
+						activeStyle = _this.styles[prop];
+						if (!_this.tokenIndex[token.key]) _this.tokenIndex[token.key] = {};
+						_this.tokenIndex[token.key][activeStyle.selector] = activeStyle;
+						if (!_this.styleIndex[token.key]) _this.styleIndex[token.key] = {};
+						_this.styleIndex[token.key][activeStyle.selector] = activeStyle.body;
+					}
+
+					if (prop.match(/^\@extend($|[0-9])/)) {
+						var _parent = _this.styles[obj[prop]];
+						if (!_parent) console.log('\'' + obj[prop] + '\' cannot be extended because it does not exist!');else {
+							activeStyle.parents[obj[prop]] = obj[prop];
+							_parent.children[activeStyle.selector] = '.' + activeStyle.token + ' ' + activeStyle.selector;
+							_this.renderStack[_parent.token] = _parent.token;
+						}
+					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
+						_this.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
+					} else if (prop.match(/^\@media\s/)) console.log('media query');
+
+					if (typeof obj[prop] === 'object') {
+						extract(obj[prop]);
+					}
+				}
+				level--;
+			};
+			extract(obj);
+			this.renderStack[token.key] = token.key;
+			console.log(this);
+		}
+	}, {
+		key: 'compile',
+		value: function compile() {
+			for (var item in this.renderStack) {
+				var compiler = new _Compiler.Compiler(this);
+				var result = compiler.parse(this.styleIndex[this.renderStack[item]], this.renderStack[item]);
+				console.log(result);
+				this.tags[item].update(result);
+			}
+		}
+	}]);
+
+	return StoreSingleton;
+})();
+
+var Store = new StoreSingleton();
+exports.Store = Store;
+
+},{"./Compiler":1,"./Style":5}],5:[function(require,module,exports){
 "use strict";
 
-module.exports = function () {
-	var self = this;
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
-	var selectors = {};
-	var mixins = {};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	this.setSelector = function (id, obj) {
-		selectors[id] = obj;
-	};
+var Style = function Style(token, selector, body) {
+	_classCallCheck(this, Style);
 
-	this.getSelector = function (id) {
-		return selectors[id];
-	};
-
-	this.setMixin = function (id, fn) {
-		mixins[id] = fn;
-	};
-
-	this.getMixin = function (id, params) {
-		return mixins[id](params);
-	};
+	this.token = token;
+	this.selector = selector;
+	this.body = body;
+	this.parents = {};
+	this.children = {};
 };
 
-},{}]},{},[4])(4)
+exports.Style = Style;
+
+},{}],6:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var Tag = (function () {
+	function Tag(id) {
+		_classCallCheck(this, Tag);
+
+		this.tag = this.generateTag('rss-' + id);
+	}
+
+	_createClass(Tag, [{
+		key: 'generateTag',
+		value: function generateTag(id) {
+			var el = document.createElement('style');
+			el.id = id;
+			var container = document.getElementById('rss-container');
+			container.appendChild(el);
+			return el;
+		}
+	}, {
+		key: 'getTag',
+		value: function getTag() {
+			return this.tag;
+		}
+	}, {
+		key: 'update',
+		value: function update(stringified) {
+			this.tag.innerHTML = stringified;
+		}
+	}]);
+
+	return Tag;
+})();
+
+exports.Tag = Tag;
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Token = (function () {
+	function Token() {
+		_classCallCheck(this, Token);
+
+		this.key = this.generateKey(4);
+		this.current = false;
+	}
+
+	_createClass(Token, [{
+		key: "generateKey",
+		value: function generateKey(length) {
+			var key = "";
+			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			for (var i = 0; i < length; i++) key += possible.charAt(Math.floor(Math.random() * possible.length));
+			return key;
+		}
+	}]);
+
+	return Token;
+})();
+
+exports.Token = Token;
+
+},{}]},{},[3])(3)
 });

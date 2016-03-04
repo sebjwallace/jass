@@ -1,0 +1,23 @@
+
+Objects:
+	Component( -token )
+	Tag( -token ) 
+	Token
+	Store
+		[ -token ]
+		Style( -token )
+	Compiler
+
+
+setStyles sends the object of styles to the Store with a Token.
+
+The Store holds all styles, media queries and mixins. Each style is wrapped in a Style object with metadata such as token and children.
+
+The Store updates each style with new values and scans for inheritance, then sets the token for the styles not current.
+	If there is inheritance it also updates the parent with a new child, if it has not already been added.
+	It also sets the current attribute of the parents token to false
+
+The Store then loops through all tokens for non current attributes.
+It then sends all selectors with non current tokens to the Compiler.
+
+The Compiler outputs a string to be appended to the style tag associated with the tag.

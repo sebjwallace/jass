@@ -1,15 +1,14 @@
 {
-  "name": "sebjwallace_website",
+  "name": "rss",
   "version": "1.0.0",
-  "description": "",
+  "description": "Reactive StyleSheets",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine-node spec & gulp test"
+    "test": "gulp test"
   },
-  "author": "",
+  "author": "Sebastian Wallace",
   "license": "ISC",
   "dependencies": {
-    "font-awesome": "^4.5.0",
     "react": "^0.14.7",
     "react-dom": "^0.14.7"
   },
@@ -17,11 +16,18 @@
     "babelify": "^6.0.2",
     "browserify": "^13.0.0",
     "gulp": "^3.9.1",
-    "gulp-open": "^1.0.0",
-    "gulp-uglify": "^1.5.3",
     "jasmine-core": "^2.4.1",
-    "opn": "^4.0.0",
-    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebjwallace/rss.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sebjwallace/rss/issues"
+  },
+  "homepage": "https://github.com/sebjwallace/rss#readme"
 }

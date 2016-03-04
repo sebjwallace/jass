@@ -1,119 +1,111 @@
 
 describe('RSS', function(){
 
+	var component = new RSS.Component();
+
 	it('gets instantiated', function(){
-		var rss = new RSS();
-		expect(rss).toBeDefined();
+		expect(component).toBeDefined();
 	});
 
-	it('accepts styles to be parsed, returned as a string without appending to the DOM', function(){
-		var rss = new RSS();
-		var parsedStyles = rss.setStyles({
-			'#my-id':{
-				color: 'blue',
-				'font-size': '1.2em'
-			}
-		},true); // < second parameter set to true for string return
-		expect(parsedStyles).toBe('#my-id{color:blue;font-size:1.2em;}');
+	it('appends a rss-container to the document.body', function(){
+		expect(document.getElementById('rss-container')).not.toBe(null);
 	});
 
-	it('accepts styles to be parsed, then appends to the DOM', function(){
-		var rss = new RSS();
-		rss.setStyles({
-			'#my-id':{
-				color: 'blue',
-				'font-size': '1.2em'
+	it('accepts an object literal of styles', function(){
+		component.setStyles({
+			'#my-id': {
+				color: 'brown',
+				'font-size': '1em'
 			}
 		});
-		var id = rss.getIds('initial');
-		var reactiveId = rss.getIds('reactive');
-		expect(document.getElementById(id).innerHTML).toBe('#my-id{color:blue;font-size:1.2em;}');
-		expect(document.getElementById(reactiveId)).toBeDefined();
+		expect(component.getStyleTag().innerHTML)
+			.toContain(component.getScope() + ' #my-id{color:brown;font-size:1em;}');
 	});
 
-	it('is meant to render styles in two phases', function(){
-		var rss = new RSS();
-		// the initial styles are set - the static styles that are not reactive to changing state
-		rss.setStyles({ '#my-id':{ border: '1px solid blue' } });
-		var id = rss.getIds('initial');
-		expect(document.getElementById(id).innerHTML).toBe('#my-id{border:1px solid blue;}');
-
-		// the reactive styles can change - dynamics styles that react to changing state
-		rss.setStyles({ '#my-id':{ 'border-color': 'green' } });
-		var reactiveId = rss.getIds('reactive');
-		expect(document.getElementById(reactiveId).innerHTML).toBe('#my-id{border-color:green;}');
-	});
-
-	it('can do standard JS operations to create values', function(){
-		var rss = new RSS();
-		var size = 10;
-		rss.setStyles({
-			'#my-id':{
-				width: size * 2 + 'px',
-				height: size * 4 + 'px'
-			}
-		});
-		var reactiveId = rss.getIds('initial');
-		expect(document.getElementById(reactiveId).innerHTML).toBe('#my-id{width:20px;height:40px;}');
-	});
-
-	it('can use nestings', function(){
-		var rss = new RSS();
-		rss.setStyles({
-			'#my-id':{
-				color: 'green',
-				'> a': {
-					color: 'blue',
-					'> :hover': {
-						color: 'orange'
-					}
+	it('accepts nestings', function(){
+		component.setStyles({
+			'#my-id': {
+				color: 'brown',
+				'> i': {
+					color: 'gray'
 				}
 			}
 		});
-		var reactiveId = rss.getIds('initial');
-		expect(document.getElementById(reactiveId).innerHTML).toBe('#my-id{color:green;}#my-id a{color:blue;}#my-id a :hover{color:orange;}');
+		expect(component.getStyleTag().innerHTML)
+			.toContain(component.getScope() + ' #my-id{color:brown;} '+ component.getScope() +' #my-id i{color:gray;}');
 	});
 
-	it('can use inheritance via export/import', function(){
-		var rss = new RSS();
-		rss.export('.success',{
-		    color: '#fff',
-		    'background-color': '#5cb85c',
-		    'border-color': '#4cae4c'
-		});
-		rss.setStyles({
-			'.big-success': {
-				'@import': '.success',
-				'font-size': '2em'
+	it('accepts mixins', function(){
+		component.setStyles({
+			'mixins':{
+				'@mixin rounded-corners': function(radius){
+					return {
+						'-webkit-border-radius': radius,
+						   '-moz-border-radius': radius,
+						    '-ms-border-radius': radius,
+						        'border-radius': radius
+					}
+				}
+			},
+			'.message': {
+				'background-color': 'gray',
+				'@mixin rounded-corners': '5px'
 			}
 		});
-		var reactiveId = rss.getIds('initial');
-		expect(document.getElementById(reactiveId).innerHTML).toBe(
-			'.big-success{font-size:2em;}.success, .big-success{color:#fff;background-color:#5cb85c;border-color:#4cae4c;}'
-		);
+		expect(component.getStyleTag().innerHTML)
+			.toContain('.message{background-color:gray;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;}')
 	});
 
-
-	it('can use mixins', function(){
-		var rss = new RSS();
-		rss.mixin('border-radius',function(radius){
-			return {
-				'-webkit-border-radius': radius,
-			     '-moz-border-radius': radius,
-			      '-ms-border-radius': radius,
-			          'border-radius': radius
+	it('accepts inheritance', function(){
+		var parentComponent = new RSS.Component();
+		parentComponent.setStyles({
+			'.btn': {
+				'border': '1px solid aqua'
 			}
 		});
-		rss.setStyles({
-			'.rounded': {
-				'@border-radius': '8px',
-				'height': '40px'
+		component.setStyles({
+			'.submit-btn': {
+				'@extend': '.btn',
+				'font-size': '1.8em'
 			}
 		});
-		var reactiveId = rss.getIds('initial');
-		expect(document.getElementById(reactiveId).innerHTML).toBe(
-			'.rounded{-webkit-border-radius:8px;-moz-border-radius:8px;-ms-border-radius:8px;border-radius:8px;height:40px;}'
-		);
+		expect(parentComponent.getStyleTag().innerHTML)
+			.toContain(
+				component.getScope() + " .submit-btn ,  "
+				+ parentComponent.getScope() + " .btn{border:1px solid aqua;}"
+			)
 	});
 
-})
+	it('accepts multiple inheritance', function(){
+		var parentComponent = new RSS.Component();
+		var anotherParentComponent = new RSS.Component();
+		parentComponent.setStyles({
+			'.parentA': {
+				'border': '1px solid aqua'
+			}
+		});
+		anotherParentComponent.setStyles({
+			'.parentB': {
+				'padding': '40px'
+			}
+		});
+		component.setStyles({
+			'.child': {
+				'@extend': '.parentA',
+				'@extend1': '.parentB',
+				'font-size': '1.8em'
+			}
+		});
+		expect(anotherParentComponent.getStyleTag().innerHTML)
+			.toContain(
+				component.getScope() + " .child ,  "
+				+ anotherParentComponent.getScope() + " .parentB{padding:40px;}"
+			);
+		expect(parentComponent.getStyleTag().innerHTML)
+			.toContain(
+				component.getScope() + " .child ,  "
+				+ parentComponent.getScope() + " .parentA{border:1px solid aqua;}"
+			);
+	});
+
+});
