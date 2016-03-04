@@ -41,7 +41,7 @@ class StoreSingleton{
 					if(!parent) console.log( `'${obj[prop]}' cannot be extended because it does not exist!`);
 					else{
 						activeStyle.parents[obj[prop]] = obj[prop];
-						parent.children[activeStyle.selector] = '.' + activeStyle.token + ' ' + activeStyle.selector;
+						parent.children['.' + activeStyle.token + '&' + activeStyle.selector] = true;
 						this.renderStack[parent.token] = parent.token;
 					}
 				}
@@ -61,16 +61,17 @@ class StoreSingleton{
 		}
 		extract(obj);
 		this.renderStack[token.key] = token.key;
-		console.log(this);
+		//console.log(this);
 	}
 	compile(){
 		for(let item in this.renderStack){
 			const compiler = new Compiler(this);
 			const result = compiler
 				.parse(this.styleIndex[this.renderStack[item]],this.renderStack[item]);
-			console.log(result);
+			//console.log(result);
 			this.tags[item].update(result);
 		}
+		this.renderStack = {};
 	}
 }
 

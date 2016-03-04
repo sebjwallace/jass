@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+	  <meta charset="utf-8">
+	  <title>Reactive Stylesheets</title>
+	</head>
+
+	 <body style="font-family: monospace">
+
+		<div id='root'></div>
+
+		<script src="https://fb.me/react-0.13.3.js"></script>
+    	<script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+
+		<script type="text/javascript" src="../dist/rss.js"></script>
+
+		<script type="text/jsx">
+
+			var globals = new RSS.Component();
+			globals.set({
+				'@mixin width-center': function(width){
+					return {
+						width: width + '%',
+						'margin-left': ((100 - width) / 2) + '%'
+					}
+				},
+				'@mixin rounded-corners': function(radius){
+					return {
+						'-webkit-border-radius': radius,
+						   '-moz-border-radius': radius,
+						    '-ms-border-radius': radius,
+						        'border-radius': radius
+					}
+				},
+				'.box': {
+					'@mixin rounded-corners': '5px',
+					padding: '10px',
+					'transition': 'all 0.5s',
+					'> h3': {
+						'text-transform': 'uppercase'
+					}
+				}
+			});
+
+			var MainBox = React.createClass({
+				componentWillMount: function(){
+					this.styles = new RSS.Component();
+					this.setState({ width: this.props.width });
+					this.setState({ color: this.props.color });
+				},
+				handleWidth: function(event){
+					this.setState({ width: event.currentTarget.value});
+				},
+				handleColor: function(event){
+					this.setState({ color: event.currentTarget.value});
+				},
+				render: function(){
+					this.styles.set({
+						'#box': {
+							'@extend': '.box',
+							'@mixin width-center': this.state.width,
+							'background-color': this.state.color
+						},
+						'input[type="text"]': {
+							'background-color': 'transparent',
+							border: 'solid 1px white',
+							padding: '2px',
+							margin: '5px',
+							display: 'block',
+							transition: 'all 1s',
+							'> :hover': {
+								'background-color': 'rgba(255,255,255,0.5)'
+							}
+						}
+					});
+					return (
+						<div className={this.styles.className()}>
+							<div id="box">
+								<h3>{ this.props.name }</h3>
+								<input defaultValue={this.state.width} onChange={this.handleWidth} type="text" />
+								<input defaultValue={this.state.color} onChange={this.handleColor} type="text" />
+								{ this.props.children }
+							</div>
+						</div>
+					);
+				}
+			});
+
+			React.render(
+			<MainBox name="mainbox" color="rgba(20,40,80,0.2)" width="80">
+				<MainBox name="subbox" color="rgba(80,40,20,0.2)" width="20">
+				</MainBox>
+			</MainBox>,
+			document.getElementById('root'));
+		</script>
+	 </body>
+
+ </html>

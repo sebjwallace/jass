@@ -36,7 +36,7 @@ var Compiler = (function () {
 	}, {
 		key: 'isNesting',
 		value: function isNesting(check) {
-			return check.match(/^\>\s[^]+$/);
+			return check.match(/^\>[^]/);
 		}
 	}, {
 		key: 'generateSelector',
@@ -46,9 +46,9 @@ var Compiler = (function () {
 			var check = selector.match(/^[^\s]+/)[0];
 			var postfixes = selector.replace(/^[^\s]+/, '');
 			if (this.Store.styles[check]) for (var child in this.Store.styles[check].children) {
-				children += this.Store.styles[check].children[child] + ' ' + postfixes + ', ';
+				children += child.replace('&', ' ') + ' ' + postfixes + ', ';
 			}
-			return children + ' ' + '.' + scope + ' ' + selector;
+			return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/, ':');
 		}
 	}, {
 		key: 'parse',
@@ -84,7 +84,7 @@ var Compiler = (function () {
 							stitch(key(obj[props]));
 						}
 					} else if (_this.isNesting(props)) {
-						var item = _defineProperty({}, parentID + " " + props.replace('> ', ''), obj[props]);
+						var item = _defineProperty({}, parentID + " " + props.replace('>', ''), obj[props]);
 						stack.push(item); // the item could have children + parentId with a keyword to replace with the postfixes
 					} else if (_this.isExtend(props)) continue;else {
 							if (typeof obj[props] === 'object') {
@@ -150,6 +150,11 @@ var Component = (function () {
 			_Store.Store.setStyles(obj, this.token, this.tag);
 		}
 	}, {
+		key: 'set',
+		value: function set(obj) {
+			this.setStyles(obj);
+		}
+	}, {
 		key: 'getStyleTag',
 		value: function getStyleTag() {
 			return this.tag.getTag();
@@ -158,6 +163,11 @@ var Component = (function () {
 		key: 'getScope',
 		value: function getScope() {
 			return '.' + this.token.key;
+		}
+	}, {
+		key: 'className',
+		value: function className() {
+			return this.token.key;
 		}
 	}, {
 		key: 'getToken',
@@ -259,7 +269,7 @@ var StoreSingleton = (function () {
 						var _parent = _this.styles[obj[prop]];
 						if (!_parent) console.log('\'' + obj[prop] + '\' cannot be extended because it does not exist!');else {
 							activeStyle.parents[obj[prop]] = obj[prop];
-							_parent.children[activeStyle.selector] = '.' + activeStyle.token + ' ' + activeStyle.selector;
+							_parent.children['.' + activeStyle.token + '&' + activeStyle.selector] = true;
 							_this.renderStack[_parent.token] = _parent.token;
 						}
 					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
@@ -274,7 +284,7 @@ var StoreSingleton = (function () {
 			};
 			extract(obj);
 			this.renderStack[token.key] = token.key;
-			console.log(this);
+			//console.log(this);
 		}
 	}, {
 		key: 'compile',
@@ -282,9 +292,10 @@ var StoreSingleton = (function () {
 			for (var item in this.renderStack) {
 				var compiler = new _Compiler.Compiler(this);
 				var result = compiler.parse(this.styleIndex[this.renderStack[item]], this.renderStack[item]);
-				console.log(result);
+				//console.log(result);
 				this.tags[item].update(result);
 			}
+			this.renderStack = {};
 		}
 	}]);
 
@@ -351,6 +362,12 @@ var Tag = (function () {
 		key: 'update',
 		value: function update(stringified) {
 			this.tag.innerHTML = stringified;
+			// console.log(stringified);
+			// for (var i=0; i < document.styleSheets.length; i++){
+			// 	if(document.styleSheets[i].ownerNode ==  this.tag){
+			// 		document.styleSheets[i].insertRule(stringified,0);
+			// 	}
+			// }
 		}
 	}]);
 
@@ -382,7 +399,7 @@ var Token = (function () {
 		key: "generateKey",
 		value: function generateKey(length) {
 			var key = "";
-			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 			for (var i = 0; i < length; i++) key += possible.charAt(Math.floor(Math.random() * possible.length));
 			return key;
 		}

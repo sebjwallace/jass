@@ -5,7 +5,7 @@ export class Token{
 	}
 	generateKey(length){
 		var key = "";
-	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	    for( var i=0; i < length; i++ )
 	        key += possible.charAt(Math.floor(Math.random() * possible.length));
 	    return key;

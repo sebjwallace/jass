@@ -10,11 +10,17 @@ export class Component{
 	setStyles(obj){
 		Store.setStyles(obj,this.token,this.tag);
 	}
+	set(obj){
+		this.setStyles(obj);
+	}
 	getStyleTag(){
 		return this.tag.getTag();
 	}
 	getScope(){
 		return '.' + this.token.key;
+	}
+	className(){
+		return this.token.key;
 	}
 	getToken(){
 		return this.token.key;

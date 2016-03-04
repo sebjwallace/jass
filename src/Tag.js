@@ -14,5 +14,11 @@ export class Tag{
 	}
 	update(stringified){
 		this.tag.innerHTML = stringified;
+		// console.log(stringified);
+		// for (var i=0; i < document.styleSheets.length; i++){
+		// 	if(document.styleSheets[i].ownerNode ==  this.tag){
+		// 		document.styleSheets[i].insertRule(stringified,0);
+		// 	}
+		// }
 	}
 }

@@ -13,7 +13,7 @@ export class Compiler{
 		return check.match(/^\@mixin\s/);
 	}
 	isNesting(check){
-		return check.match(/^\>\s[^]+$/);
+		return check.match(/^\>[^]/);
 	}
 	generateSelector(selector,scope){
 		//if (this.isMediaQuery(selector)) return selector;
@@ -22,9 +22,9 @@ export class Compiler{
 		let postfixes = selector.replace(/^[^\s]+/,'');
 		if (this.Store.styles[check])
 			for(let child in this.Store.styles[check].children){
-					children += this.Store.styles[check].children[child] + ' ' + postfixes + ', ';
+					children += child.replace('&',' ') + ' ' + postfixes + ', ';
 			}
-		return children + ' ' + '.' + scope + ' ' + selector;
+		return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/,':');
 	}
 
 	parse(obj,scope){
@@ -59,7 +59,7 @@ export class Compiler{
 					}
 				}
 				else if (this.isNesting(props)){
-					var item = { [parentID + " " + props.replace('> ','')] : obj[props] };
+					var item = { [parentID + " " + props.replace('>','')] : obj[props] };
 					stack.push(item); // the item could have children + parentId with a keyword to replace with the postfixes
 				}
 				else if(this.isExtend(props)) continue;
