@@ -85,18 +85,18 @@ var Compiler = (function () {
 						}
 					} else if (_this.isNesting(props)) {
 						var item = _defineProperty({}, parentID + " " + props.replace('>', ''), obj[props]);
-						stack.push(item); // the item could have children + parentId with a keyword to replace with the postfixes
+						stack.push(item);
 					} else if (_this.isExtend(props)) continue;else {
-							if (typeof obj[props] === 'object') {
-								sum += _this.generateSelector(props, scope);
-								sum += "{";
-								stitch(obj[props]);
-								sum += "}";
-							} else {
-								sum += props;
-								sum += ":" + obj[props] + ";";
-							}
+						if (typeof obj[props] === 'object') {
+							if (_this.isMediaQuery(props)) sum += props;else sum += _this.generateSelector(props, scope);
+							sum += "{";
+							stitch(obj[props]);
+							sum += "}";
+						} else {
+							sum += props;
+							sum += ":" + obj[props] + ";";
 						}
+					}
 				}
 
 				level--;
@@ -274,7 +274,7 @@ var StoreSingleton = (function () {
 						}
 					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
 						_this.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
-					} else if (prop.match(/^\@media\s/)) console.log('media query');
+					}
 
 					if (typeof obj[prop] === 'object') {
 						extract(obj[prop]);

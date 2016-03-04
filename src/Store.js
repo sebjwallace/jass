@@ -50,9 +50,6 @@ class StoreSingleton{
 					this.mixins[prop.replace(/^\@mixin\s/,'')] = obj[prop];
 				}
 
-				else if(prop.match(/^\@media\s/))
-					console.log('media query')
-
 				if(typeof obj[prop] === 'object'){
 					extract(obj[prop]);
 				}

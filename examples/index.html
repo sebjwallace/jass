@@ -3,10 +3,11 @@
 
 	<head>
 	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width">
 	  <title>Reactive Stylesheets</title>
 	</head>
 
-	 <body style="font-family: monospace">
+	 <body style="font-family: monospace;">
 
 		<div id='root'></div>
 
@@ -50,7 +51,8 @@
 					this.setState({ color: this.props.color });
 				},
 				handleWidth: function(event){
-					this.setState({ width: event.currentTarget.value});
+					if(event.currentTarget.value <= 100)
+						this.setState({ width: event.currentTarget.value});
 				},
 				handleColor: function(event){
 					this.setState({ color: event.currentTarget.value});
@@ -63,14 +65,21 @@
 							'background-color': this.state.color
 						},
 						'input[type="text"]': {
-							'background-color': 'transparent',
-							border: 'solid 1px white',
-							padding: '2px',
+							'@extend': '.box',
+							'background-color': 'rgba(255,255,255,0.4)',
 							margin: '5px',
-							display: 'block',
+							border: 'none',
 							transition: 'all 1s',
 							'> :hover': {
-								'background-color': 'rgba(255,255,255,0.5)'
+								'background-color': 'rgba(255,255,255,0.8)'
+							}
+						},
+						'@media only screen and (max-width: 760px)': {
+							'input[type="text"]':{
+								display: 'none'
+							},
+							'.box': {
+								'@mixin width-center': '90'
 							}
 						}
 					});
@@ -88,8 +97,8 @@
 			});
 
 			React.render(
-			<MainBox name="mainbox" color="rgba(20,40,80,0.2)" width="80">
-				<MainBox name="subbox" color="rgba(80,40,20,0.2)" width="20">
+			<MainBox name="re-color" color="rgba(20,40,80,0.2)" width="80">
+				<MainBox name="re-size" color="rgba(80,40,20,0.2)" width="20">
 				</MainBox>
 			</MainBox>,
 			document.getElementById('root'));

@@ -60,12 +60,15 @@ export class Compiler{
 				}
 				else if (this.isNesting(props)){
 					var item = { [parentID + " " + props.replace('>','')] : obj[props] };
-					stack.push(item); // the item could have children + parentId with a keyword to replace with the postfixes
+					stack.push(item);
 				}
 				else if(this.isExtend(props)) continue;
 				else{
 					if(typeof obj[props] === 'object'){
-						sum += this.generateSelector(props,scope);
+						if(this.isMediaQuery(props))
+							sum += props;
+						else
+							sum += this.generateSelector(props,scope);
 						sum += "{";
 							stitch(obj[props]);
 						sum += "}";
