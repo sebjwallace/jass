@@ -20,6 +20,7 @@
 
 			var globals = new RSS.Component();
 			globals.set({
+				$inputColor: 'rgba(255,255,255,0.4)',
 				'@mixin width-center': function(width){
 					return {
 						width: width + '%',
@@ -66,7 +67,7 @@
 						},
 						'input[type="text"]': {
 							'@extend': '.box',
-							'background-color': 'rgba(255,255,255,0.4)',
+							'background-color': '$inputColor',
 							margin: '5px',
 							border: 'none',
 							transition: 'all 1s',

@@ -29,6 +29,12 @@ var Compiler = (function () {
 			return check.match(/^\@extend($|[0-9])/);
 		}
 	}, {
+		key: 'isVariable',
+		value: function isVariable(check) {
+			if (typeof check != 'string') return false;
+			return check.match(/^\$[a-z,A-Z]+$/);
+		}
+	}, {
 		key: 'isMixin',
 		value: function isMixin(check) {
 			return check.match(/^\@mixin\s/);
@@ -41,7 +47,6 @@ var Compiler = (function () {
 	}, {
 		key: 'generateSelector',
 		value: function generateSelector(selector, scope) {
-			//if (this.isMediaQuery(selector)) return selector;
 			var children = '';
 			var check = selector.match(/^[^\s]+/)[0];
 			var postfixes = selector.replace(/^[^\s]+/, '');
@@ -51,20 +56,20 @@ var Compiler = (function () {
 			return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/, ':');
 		}
 	}, {
+		key: 'generateValue',
+		value: function generateValue(value) {
+			if (this.isVariable(value)) return this.Store.variables[value];else return value;
+		}
+	}, {
 		key: 'parse',
 		value: function parse(obj, scope) {
 			var _this = this;
 
-			var scope = scope;
 			var parentID = '';
 			var parentOBJ = {};
 			var stack = [];
 
 			var sum = "";
-			var extensions = {};
-
-			// keep track of recursion level
-			// level 1 keys are selectors
 			var level = 0;
 
 			var stitch = function stitch(obj) {
@@ -72,6 +77,8 @@ var Compiler = (function () {
 				level++;
 
 				for (var props in obj) {
+
+					if (_this.isVariable(props)) continue;
 
 					if (level == 1 && !_this.isMediaQuery(props)) {
 						parentID = props;
@@ -82,7 +89,7 @@ var Compiler = (function () {
 						if (typeof obj[props] == 'string') {
 							var key = _this.Store.mixins[props.replace('@mixin ', '')];
 							stitch(key(obj[props]));
-						}
+						} else continue;
 					} else if (_this.isNesting(props)) {
 						var item = _defineProperty({}, parentID + " " + props.replace('>', ''), obj[props]);
 						stack.push(item);
@@ -94,7 +101,7 @@ var Compiler = (function () {
 							sum += "}";
 						} else {
 							sum += props;
-							sum += ":" + obj[props] + ";";
+							sum += ":" + _this.generateValue(obj[props]) + ";";
 						}
 					}
 				}
@@ -227,10 +234,10 @@ var StoreSingleton = (function () {
 	function StoreSingleton() {
 		_classCallCheck(this, StoreSingleton);
 
-		this.styles = [];
+		this.styles = {};
 		this.tags = {};
 		this.mixins = {};
-		this.mediaQueries = [];
+		this.variables = {};
 		this.tokenIndex = {};
 		this.styleIndex = {};
 		this.renderStack = {};
@@ -272,6 +279,8 @@ var StoreSingleton = (function () {
 							_parent.children['.' + activeStyle.token + '&' + activeStyle.selector] = true;
 							_this.renderStack[_parent.token] = _parent.token;
 						}
+					} else if (prop.match(/^\$[a-z,A-Z]+$/)) {
+						_this.variables[prop] = obj[prop];
 					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
 						_this.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
 					}

@@ -9,6 +9,11 @@ export class Compiler{
 	isExtend(check){
 		return check.match(/^\@extend($|[0-9])/);
 	}
+	isVariable(check){
+		if(typeof check != 'string')
+			return false;
+		return check.match(/^\$[a-z,A-Z]+$/);
+	}
 	isMixin(check){
 		return check.match(/^\@mixin\s/);
 	}
@@ -16,7 +21,6 @@ export class Compiler{
 		return check.match(/^\>[^]/);
 	}
 	generateSelector(selector,scope){
-		//if (this.isMediaQuery(selector)) return selector;
 		var children = '';
 		let check = selector.match(/^[^\s]+/)[0];
 		let postfixes = selector.replace(/^[^\s]+/,'');
@@ -26,26 +30,28 @@ export class Compiler{
 			}
 		return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/,':');
 	}
+	generateValue(value){
+		if(this.isVariable(value))
+			return this.Store.variables[value];
+		else return value;
+	}
 
 	parse(obj,scope){
 
-		var scope = scope;
-		var parentID = '';
-		var parentOBJ = {};
-		var stack = [];
+		let parentID = '';
+		let parentOBJ = {};
+		let stack = [];
 
-		var sum = "";
-		var extensions = {};
+		let sum = "";
+		let level = 0;
 
-		// keep track of recursion level
-		// level 1 keys are selectors
-		var level = 0;
-
-		var stitch = (obj) => {
+		const stitch = (obj) => {
 
 			level++;
 
-			for(var props in obj){
+			for(const props in obj){
+
+				if(this.isVariable(props)) continue;
 
 				if(level == 1 && !this.isMediaQuery(props)){
 					parentID = props;
@@ -57,9 +63,10 @@ export class Compiler{
 						const key = this.Store.mixins[props.replace('@mixin ','')];
 						stitch(key(obj[props]));
 					}
+					else continue;
 				}
 				else if (this.isNesting(props)){
-					var item = { [parentID + " " + props.replace('>','')] : obj[props] };
+					let item = { [parentID + " " + props.replace('>','')] : obj[props] };
 					stack.push(item);
 				}
 				else if(this.isExtend(props)) continue;
@@ -74,7 +81,7 @@ export class Compiler{
 						sum += "}";
 					} else{
 						sum += props;
-						sum += ":" + obj[props] + ";";
+						sum += ":" + this.generateValue(obj[props]) + ";";
 					}
 				}
 			}
@@ -84,8 +91,8 @@ export class Compiler{
 
 		stitch(obj);
 
-		var len = stack.length;
-		for(var i=0; i<len; i++){
+		let len = stack.length;
+		for(let i=0; i<len; i++){
 			stitch(stack[i]);
 			len = stack.length;
 		}

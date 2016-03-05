@@ -3,10 +3,10 @@ import { Compiler } from './Compiler';
 
 class StoreSingleton{
 	constructor(){
-		this.styles = [];
+		this.styles = {};
 		this.tags = {};
 		this.mixins = {};
-		this.mediaQueries = [];
+		this.variables = {};
 		this.tokenIndex = {};
 		this.styleIndex = {};
 		this.renderStack = {};
@@ -44,6 +44,10 @@ class StoreSingleton{
 						parent.children['.' + activeStyle.token + '&' + activeStyle.selector] = true;
 						this.renderStack[parent.token] = parent.token;
 					}
+				}
+
+				else if(prop.match(/^\$[a-z,A-Z]+$/)){
+					this.variables[prop] = obj[prop];
 				}
 
 				else if(prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function'){
