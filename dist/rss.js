@@ -58,7 +58,7 @@ var Compiler = (function () {
 			if (this.Store.styles[check]) for (var child in this.Store.styles[check].children) {
 				children += child.replace('&', ' ') + ' ' + postfixes + ', ';
 			}
-			return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/, ':');
+			return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/, ':').replace('BASE', '');
 		}
 	}, {
 		key: 'generateValue',
@@ -154,11 +154,12 @@ var _Store = require('./Store');
 var _Tag = require('./Tag');
 
 var Component = (function () {
-	function Component() {
+	function Component(styles) {
 		_classCallCheck(this, Component);
 
 		this.token = new _Token.Token();
 		this.tag = new _Tag.Tag(this.token.key);
+		if (styles) this.setStyles(styles);
 	}
 
 	_createClass(Component, [{

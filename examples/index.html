@@ -18,8 +18,7 @@
 
 		<script type="text/jsx">
 
-			var globals = new RSS.Component();
-			globals.set({
+			var globals = new RSS.Component({
 				$inputColor: 'rgba(255,255,255,0.4)',
 				'@mixin width-center': function(width){
 					return {
@@ -79,7 +78,7 @@
 								'background-color': 'rgba(255,255,255,0.8)'
 							}
 						},
-						'@media only screen and (max-width: 760px)': {
+						'@media only screen and (max-width: 740px)': {
 							'input[type="text"]':{
 								display: 'none'
 							},
@@ -102,8 +101,8 @@
 			});
 
 			React.render(
-			<MainBox name="re-color" color="rgba(20,40,80,0.2)" width="80">
-				<MainBox name="re-size" color="rgba(80,40,20,0.2)" width="20">
+			<MainBox name="re-color" color="rgba(20,40,200,0.2)" width="80">
+				<MainBox name="re-size" color="rgba(200,40,20,0.2)" width="20">
 				</MainBox>
 			</MainBox>,
 			document.getElementById('root'));

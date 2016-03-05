@@ -31,7 +31,9 @@ export class Compiler{
 			for(let child in this.Store.styles[check].children){
 					children += child.replace('&',' ') + ' ' + postfixes + ', ';
 			}
-		return (children + ' ' + '.' + scope + ' ' + selector).replace(/\s+\:/,':');
+		return (children + ' ' + '.' + scope + ' ' + selector)
+			.replace(/\s+\:/,':')
+			.replace('BASE','');
 	}
 	generateValue(value){
 		if(this.isVariable(value))

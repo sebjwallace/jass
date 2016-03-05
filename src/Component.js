@@ -3,9 +3,10 @@ import {Store} from './Store';
 import {Tag} from './Tag';
 
 export class Component{
-	constructor(){
+	constructor(styles){
 		this.token = new Token();
 		this.tag = new Tag(this.token.key);
+		if (styles) this.setStyles(styles);
 	}
 	setStyles(obj){
 		Store.setStyles(obj,this.token,this.tag);
