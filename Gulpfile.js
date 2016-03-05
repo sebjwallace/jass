@@ -1,9 +1,6 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
 var babelify = require('babelify');
-var babel = require('gulp-babel');
-var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
 var source = require('vinyl-source-stream');
 
 gulp.task('es6', function() {
@@ -18,14 +15,13 @@ gulp.task('es6', function() {
 });
 
 gulp.task('dev', function() {
-  return gulp.src('src/*.js')
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(concat('rss.js'))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist'));
+  return browserify('./src/RSS.js',{
+        standalone: 'RSS'
+    })
+    .transform(babelify)
+    .bundle()
+    .pipe(source('rss.js'))
+    .pipe(gulp.dest('./dist'));
 });
 
 //gulp.task('default', ['es6']);
