@@ -1,6 +1,6 @@
 "# react-rss" 
 
-![splash](https://raw.githubusercontent.com/sebjwallace/rss/master/splash.jpg)
+![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo.png)
 ---
 
 #### SASS in a JS environment, super dynamic CSS!
