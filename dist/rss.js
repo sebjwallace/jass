@@ -45,6 +45,11 @@ var Compiler = (function () {
 			return check.match(/^\>[^]/);
 		}
 	}, {
+		key: 'isGrouping',
+		value: function isGrouping(check) {
+			return check.match(/^\#\s[a-z,A-Z]+$/);
+		}
+	}, {
 		key: 'generateSelector',
 		value: function generateSelector(selector, scope) {
 			var children = '';
@@ -67,8 +72,9 @@ var Compiler = (function () {
 
 			var parentID = '';
 			var parentOBJ = {};
-			var stack = [];
+			var groupingID = '';
 
+			var stack = [];
 			var sum = "";
 			var level = 0;
 
@@ -90,6 +96,10 @@ var Compiler = (function () {
 							var key = _this.Store.mixins[props.replace('@mixin ', '')];
 							stitch(key(obj[props]));
 						} else continue;
+					} else if (_this.isGrouping(props)) {
+						groupingID = props.replace('# ', '') + '-';
+						stitch(obj[props]);
+						groupingID = '';
 					} else if (_this.isNesting(props)) {
 						var item = _defineProperty({}, parentID + " " + props.replace('>', ''), obj[props]);
 						stack.push(item);
@@ -100,7 +110,7 @@ var Compiler = (function () {
 							stitch(obj[props]);
 							sum += "}";
 						} else {
-							sum += props;
+							sum += groupingID + props;
 							sum += ":" + _this.generateValue(obj[props]) + ";";
 						}
 					}

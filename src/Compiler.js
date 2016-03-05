@@ -20,6 +20,9 @@ export class Compiler{
 	isNesting(check){
 		return check.match(/^\>[^]/);
 	}
+	isGrouping(check){
+		return check.match(/^\#\s[a-z,A-Z]+$/);
+	}
 	generateSelector(selector,scope){
 		var children = '';
 		let check = selector.match(/^[^\s]+/)[0];
@@ -40,8 +43,9 @@ export class Compiler{
 
 		let parentID = '';
 		let parentOBJ = {};
-		let stack = [];
+		let groupingID = '';
 
+		let stack = [];
 		let sum = "";
 		let level = 0;
 
@@ -65,6 +69,11 @@ export class Compiler{
 					}
 					else continue;
 				}
+				else if(this.isGrouping(props)){
+					groupingID = props.replace('# ','') + '-';
+					stitch(obj[props]);
+					groupingID = '';
+				}
 				else if (this.isNesting(props)){
 					let item = { [parentID + " " + props.replace('>','')] : obj[props] };
 					stack.push(item);
@@ -80,7 +89,7 @@ export class Compiler{
 							stitch(obj[props]);
 						sum += "}";
 					} else{
-						sum += props;
+						sum += groupingID + props;
 						sum += ":" + this.generateValue(obj[props]) + ";";
 					}
 				}
