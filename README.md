@@ -1,6 +1,6 @@
 "# react-rss" 
 
-## RSS / Reactive Style Sheets
+![splash](https://raw.githubusercontent.com/sebjwallace/rss/master/splash.jpg)
 ---
 
 #### SASS in a JS environment, super dynamic CSS!
