@@ -5,7 +5,7 @@
 #### SASS in a JS environment, super dynamic CSS!
 
 ##### Codepen examples:
-[user input styles](http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010){:target="_blank"}
+<a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 
 ##### Features:
 - Variables
