@@ -101,7 +101,7 @@ var Compiler = (function () {
 						stitch(obj[props]);
 						groupingID = '';
 					} else if (_this.isNesting(props)) {
-						var item = _defineProperty({}, parentID + " " + props.replace('>', ''), obj[props]);
+						var item = _defineProperty({}, parentID + " " + props.replace('> ', ''), obj[props]);
 						stack.push(item);
 					} else if (_this.isExtend(props)) continue;else {
 						if (typeof obj[props] === 'object') {

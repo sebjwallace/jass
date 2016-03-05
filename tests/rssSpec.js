@@ -19,7 +19,7 @@ describe('RSS', function(){
 			}
 		});
 		expect(component.getStyleTag().innerHTML)
-			.toContain(component.getScope() + ' #my-id{color:brown;font-size:1em;}');
+			.toContain('#my-id{color:brown;font-size:1em;}');
 	});
 
 	it('accepts nestings', function(){
@@ -31,8 +31,8 @@ describe('RSS', function(){
 				}
 			}
 		});
-		expect(component.getStyleTag().innerHTML)
-			.toContain(component.getScope() + ' #my-id{color:brown;} '+ component.getScope() +' #my-id i{color:gray;}');
+		expect(component.getStyleTag().innerHTML).toContain("#my-id{color:brown;}");
+		expect(component.getStyleTag().innerHTML).toContain("#my-id i{color:gray;}");
 	});
 
 	it('accepts mixins', function(){

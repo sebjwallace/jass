@@ -77,7 +77,7 @@ export class Compiler{
 					groupingID = '';
 				}
 				else if (this.isNesting(props)){
-					let item = { [parentID + " " + props.replace('>','')] : obj[props] };
+					let item = { [parentID + " " + props.replace('> ','')] : obj[props] };
 					stack.push(item);
 				}
 				else if(this.isExtend(props)) continue;
