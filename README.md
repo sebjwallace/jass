@@ -91,3 +91,71 @@ Keeping within the same example, now giving the '#body' some nested and grouped 
 ```
 
 To next just prefix the selector with '> ', and to group just prefix '# '.
+
+###### Extends
+
+The links in the body might have several states: hover, visited, active. And these styles might also apply to other components too - in an article component, for example. So it would be best to abstract these styles into a parent selector.
+
+```javascript
+// global parent selectors, mixins and variables are usually kept in separate files. In this case we keep them in separate abstract RSS components (which too can be kept in separate files, if they preceed the components that consume them)
+
+let parentSelectors = new RSS.Component({
+  '.links': {
+    '> a': {
+      color: '#73DED7',
+      '> :hover': { color: '#95DE73' },
+      '> :visited': { color: '#DEDA73' },
+      '> :active': { color: '#EBAD5B' }
+    }
+  }
+});
+
+// the Message component '#body' selector can now just inherit from the '.links' parent selector
+
+'#body': {
+  '@extend': '.links',
+  '> h1': {
+    'color': '#4FABC9',
+    '# font': {
+      family: 'serif',
+      weight: 'bold',
+      size: '1.8em'
+    }
+  }
+}
+```
+
+Because the styles are reactive, if values in the parent selector changes then all the child selector values also change. So if the link colors were to change during runtime, all the changes will be propigated down through all the child selectors.
+
+###### Mixins
+
+If the Message component were to have rounded corners it would also need vendor prefixes. Mixins are useful because they accept inputs that determine the output.
+
+```javascript
+let mixins = new RSS.Component({
+  '@mixin rounded-corners': function(radius){
+    return {
+      '-webkit-border-radius': radius,
+			   '-moz-border-radius': radius,
+			    '-ms-border-radius': radius,
+			        'border-radius': radius
+    }
+  }
+});
+
+// this mixin can be applied to the root element of the component using the BASE selector
+
+BASE: {
+  '@mixin rounded-corners': '5px',
+  // other styles...
+}
+
+// if any buttons in the Massage '#body' need rounded corners too
+
+'#body': {
+  '> button': {
+    '@mixin rounded-corners': '5px'
+  },
+  // other styles...
+}
+```
