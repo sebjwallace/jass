@@ -110,7 +110,7 @@ let parentSelectors = new RSS.Component({
   }
 });
 
-// the Message component '#body' selector can now just inherit from the '.links' parent selector
+// the MessageBox component '#body' selector can now just inherit from the '.links' parent selector
 
 '#body': {
   '@extend': '.links',
@@ -150,7 +150,7 @@ BASE: {
   // other styles...
 }
 
-// if any buttons in the Massage '#body' need rounded corners too
+// if any buttons in the MessageBox '#body' need rounded corners too
 
 '#body': {
   '> button': {
@@ -158,4 +158,73 @@ BASE: {
   },
   // other styles...
 }
+```
+
+Unlike inheritance, mixins are not reactive. So if styles are shared but desired to remain static then a mixin is a better alternative.
+
+###### Variables
+
+Although regular Javascript variables are useful within the local scope of the render function, variables might also need to be global so they can be used across other components, like parent selectors and mixins.
+
+```javascript
+let variables = new RSS.Component({
+	$headingColor: '#4FABC9',
+	$borderRadius: '5px'
+});
+
+// in the MessageBox component the '#body' selector could use the $headingColor variable
+
+'#body': {
+	'> h1': {
+		color: '$headingColor'
+	},
+	'> button': {
+		'@mixin rounded-corners': '$borderRadius'
+	},
+	// other styles...
+}
+```
+
+The local Javascript variables are useful when reacting to state change:
+
+```javascript
+class MessageBox{
+  constructor(){
+  	this.styles = new RSS.Component();
+  	this.state = { visibility: 'block' }
+  }
+  handleClick(){
+  	this.state.visibile = 'hidden'
+  }
+  render(){
+    this.styles.set({
+      BASE:{
+        display: this.state.visibility
+      },
+      // other declarations...
+    });
+    return (
+      <div className={this.styles.className()} onClick={this.handleClick}>
+        // component structures...
+      </div>
+    )
+  }
+}
+```
+
+###### Media Queries
+
+The same as usual, just declare them as you would in usual CSS.
+
+```javascript
+this.styles.set({
+	BASE: {
+		width: '50%'
+	},
+	'@media only screen and (max-width: 960px)': {
+		BASE: {
+			width: '100%'
+		}
+	}
+});
 ```
