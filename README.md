@@ -1,12 +1,11 @@
-"# react-rss" 
 
 ![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
 ---
-
+"# rss" 
 #### SASS in a JS environment, super dynamic CSS!
 
 ##### Codepen examples:
-[user input styles](http://codepen.io/anon/pen/wGKOGR?editors=1010)
+[user input styles](http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010){:target="_blank"}
 
 ##### Features:
 - Variables
