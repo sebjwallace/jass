@@ -460,3 +460,5 @@ exports.Token = Token;
 
 },{}]},{},[4])(4)
 });
+
+var RSS = RSS;
