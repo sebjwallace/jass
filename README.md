@@ -7,6 +7,7 @@
 ##### Codepen examples:
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 - <a href="http://codepen.io/sebjwallace/pen/RarbBg?editors=1010" target="_blank">vanilla HTML/JS</a>
+- <a href="http://codepen.io/sebjwallace/pen/GZogLZ?editors=1010" target="_blank">click event </a>
 
 ##### Features:
 - Variables
@@ -14,6 +15,9 @@
 - Inheritance
 - Nesting / Grouping
 - Media Queries
+
+##### RSS-Specific Features
+- Events
 
 ##### What?
 RSS gives the developer the ability to declare and modify CSS at runtime using core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles.
@@ -214,6 +218,33 @@ class MessageBox{
   }
 }
 ```
+
+###### Events
+
+Styles can be modified in reaction to events. All thats needed is a listener declared in the styles declaration and a trigger. A trigger can be called from anywhere in the project where the global RSS object is available.
+
+```javascript
+render(){
+    this.styles.set({
+      BASE:{
+        opacity: 1,
+        // an event listener, listening to 'hide'
+        // when that event triggers the opacity will be set to 0
+        '@event': ['hide', { opacity: 0 } ]
+      },
+      // ...
+    });
+    return (
+      <div className={this.styles.className()} onClick={this.handleClick}>
+        // ...
+        // the trigger is binded to the click event
+        <button onClick={ RSS.Event('hide') }>Hide</button>
+      </div>
+    )
+  }
+```
+
+An event declaration requires an array with the first element/argument being the name of the event, and the second being an object literal with the styles to be modified. Its important to note that the event is only scoped to the selector its defined in - in the above example it was BASE.
 
 ###### Media Queries
 
