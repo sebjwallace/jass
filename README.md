@@ -33,6 +33,9 @@ Include via stript tag
 ```html
   <script src="../dist/rss.js"></script>
 ```
+
+<a href="https://www.npmjs.com/package/rss-js">NPM link</a>
+
 Include via Browserify or ES6
 ```javascript
 // browserify
