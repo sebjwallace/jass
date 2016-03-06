@@ -65,7 +65,7 @@
 					this.styles.set({
 						'#box': {
 							'@extend': '.box',
-							'@mixin width-center': this.state.width,
+							'@mixin width-center': [this.state.width,4,2],
 							'background-color': this.state.color
 						},
 						'input[type="text"]': {

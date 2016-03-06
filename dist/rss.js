@@ -92,10 +92,8 @@ var Compiler = (function () {
 					}
 
 					if (_this.isMixin(props)) {
-						if (typeof obj[props] == 'string') {
-							var key = _this.Store.mixins[props.replace('@mixin ', '')];
-							stitch(key(obj[props]));
-						} else continue;
+						var mixin = _this.Store.mixins[props.replace('@mixin ', '')];
+						if (typeof obj[props] == 'string') stitch(mixin(obj[props]));else if (Array.isArray(obj[props])) stitch(mixin.apply(_this, obj[props]));else continue;
 					} else if (_this.isGrouping(props)) {
 						groupingID = props.replace('# ', '') + '-';
 						stitch(obj[props]);

@@ -24,11 +24,11 @@ export class Compiler{
 		return check.match(/^\#\s[a-z,A-Z]+$/);
 	}
 	generateSelector(selector,scope){
-		var children = '';
-		let check = selector.match(/^[^\s]+/)[0];
-		let postfixes = selector.replace(/^[^\s]+/,'');
+		let children = '';
+		const check = selector.match(/^[^\s]+/)[0];
+		const postfixes = selector.replace(/^[^\s]+/,'');
 		if (this.Store.styles[check])
-			for(let child in this.Store.styles[check].children){
+			for(const child in this.Store.styles[check].children){
 					children += child.replace('&',' ') + ' ' + postfixes + ', ';
 			}
 		return (children + ' ' + '.' + scope + ' ' + selector)
@@ -65,10 +65,11 @@ export class Compiler{
 				}
 
 				if(this.isMixin(props)){
-					if(typeof obj[props] == 'string'){
-						const key = this.Store.mixins[props.replace('@mixin ','')];
-						stitch(key(obj[props]));
-					}
+					const mixin = this.Store.mixins[props.replace('@mixin ','')];
+					if(typeof obj[props] == 'string')
+						stitch( mixin(obj[props]) );
+					else if(Array.isArray(obj[props]))
+						stitch( mixin.apply(this,obj[props]) );
 					else continue;
 				}
 				else if(this.isGrouping(props)){
@@ -77,7 +78,7 @@ export class Compiler{
 					groupingID = '';
 				}
 				else if (this.isNesting(props)){
-					let item = { [parentID + " " + props.replace('> ','')] : obj[props] };
+					const item = { [parentID + " " + props.replace('> ','')] : obj[props] };
 					stack.push(item);
 				}
 				else if(this.isExtend(props)) continue;
