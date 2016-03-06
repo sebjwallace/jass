@@ -1,9 +1,11 @@
-"# react-rss" 
 
 ![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
 ---
-
+"# rss" 
 #### SASS in a JS environment, super dynamic CSS!
+
+##### Codepen examples:
+<a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 
 ##### Features:
 - Variables
@@ -90,9 +92,9 @@ Keeping within the same example, now giving the '#body' some nested and grouped 
 }
 ```
 
-To next just prefix the selector with '> ', and to group just prefix '# '.
+To nest just prefix the selector with '> ', and to group just prefix '# '.
 
-###### Extends
+###### Inheritance
 
 The links in the body might have several states: hover, visited, active. And these styles might also apply to other components too - in an article component, for example. So it would be best to abstract these styles into a parent selector.
 
@@ -136,9 +138,9 @@ let mixins = new RSS.Component({
   '@mixin rounded-corners': function(radius){
     return {
       '-webkit-border-radius': radius,
-			   '-moz-border-radius': radius,
-			    '-ms-border-radius': radius,
-			        'border-radius': radius
+	 '-moz-border-radius': radius,
+	  '-ms-border-radius': radius,
+	      'border-radius': radius
     }
   }
 });
@@ -154,7 +156,7 @@ BASE: {
 
 '#body': {
   '> button': {
-    '@mixin rounded-corners': '5px'
+    '@mixin rounded-corners': '2px'
   },
   // other styles...
 }
