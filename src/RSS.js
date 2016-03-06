@@ -12,8 +12,7 @@ class RSS{
 	}
 }
 
-export const RSSSingleton = new RSS(new Store);
-export const Event = (id) => {
+const _Event = (id) => {
 	const comp = RSSSingleton.Store.events[id].component;
 	const selector = RSSSingleton.Store.events[id].selector;
 	const styles = {};
@@ -27,4 +26,6 @@ class ComponentFacade{
 	}
 }
 
+export const RSSSingleton = new RSS(new Store);
 export const Component = ComponentFacade;
+export const Event = _Event;

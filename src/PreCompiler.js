@@ -44,7 +44,7 @@ export class PreCompiler{
 					this.Store.mixins[prop.replace(/^\@mixin\s/,'')] = obj[prop];
 				}
 
-				else if(prop.match(/^\@listen$/) && Array.isArray(obj[prop])){
+				else if(prop.match(/^\@event$/) && Array.isArray(obj[prop])){
 					this.Store.events[obj[prop][0]] = { component: this.component, selector: selector, styles: obj[prop][1] };
 				}
 

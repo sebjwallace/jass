@@ -279,7 +279,7 @@ var PreCompiler = (function () {
 						_this.Store.variables[prop] = obj[prop];
 					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
 						_this.Store.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
-					} else if (prop.match(/^\@listen$/) && Array.isArray(obj[prop])) {
+					} else if (prop.match(/^\@event$/) && Array.isArray(obj[prop])) {
 						_this.Store.events[obj[prop][0]] = { component: _this.component, selector: selector, styles: obj[prop][1] };
 					}
 
@@ -324,9 +324,7 @@ var RSS = function RSS(store) {
 	}
 };
 
-var RSSSingleton = new RSS(new _Store.Store());
-exports.RSSSingleton = RSSSingleton;
-var Event = function Event(id) {
+var _Event = function _Event(id) {
 	var comp = RSSSingleton.Store.events[id].component;
 	var selector = RSSSingleton.Store.events[id].selector;
 	var styles = {};
@@ -334,16 +332,18 @@ var Event = function Event(id) {
 	comp.setStyles(styles);
 };
 
-exports.Event = Event;
-
 var ComponentFacade = function ComponentFacade(initialStyles) {
 	_classCallCheck(this, ComponentFacade);
 
 	return new _Component2.Component(RSSSingleton.Store, initialStyles);
 };
 
+var RSSSingleton = new RSS(new _Store.Store());
+exports.RSSSingleton = RSSSingleton;
 var Component = ComponentFacade;
 exports.Component = Component;
+var Event = _Event;
+exports.Event = Event;
 
 },{"./Component":2,"./Store":5}],5:[function(require,module,exports){
 "use strict";
