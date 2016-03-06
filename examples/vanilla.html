@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width">
+	  <title>Reactive Stylesheets</title>
+	</head>
+
+	 <body style="font-family: monospace;">
+
+		<!--
+		 A very quick example to show how to use
+		RSS in a vanilla setup
+		-->
+
+		<!-- a component -->
+		<div id="root">
+		  <div id="content">
+		    <h1>RSS</h1>
+		    <h3>Reactive Style Sheets</h3>
+		  </div>
+		  <button>Hide</button>
+		  <a href="https://github.com/sebjwallace/RSS">github</a>
+		</div>
+
+		<script type="text/javascript" src="../dist/rss.js"></script>
+
+		<script type="text/javascript">
+
+			// all globals such as variables,
+			// mixins & parent selectors
+			// go into a globals component
+
+			var globals = new RSS.Component({
+			  $font: 'consolas', // variable
+			  $basePadding: '10px',
+			  '@mixin rounded-corners': function(radius){ // mixin
+			    return {
+			      '-webkit-border-radius': radius,
+			         '-moz-border-radius': radius,
+			          '-ms-border-radius': radius,
+			              'border-radius': radius
+			    }
+			  },
+			  '@mixin links' : function(link, visit, hover, active) {
+			    return {
+			      '> a': {
+					color: link,
+				    '> :visited' : { color: visit },
+				    '> :hover' : { color: hover },
+				    '> :active' : { color: active }
+			      }
+			    }
+			},
+			  '.padded': { padding: '10px' }
+			});
+
+			var rootStyles = new RSS.Component();
+			var root = document.getElementById('root');
+
+			// the root level of the component must use
+			// the base class used in the RSS component
+			root.className = rootStyles.className();
+
+			rootStyles.setStyles({
+			  BASE: {
+			    width: '50%',
+			    'background-color': '#e2e2e2',
+			    '@mixin rounded-corners': '10px',
+			    '@mixin links' : ['red','green','blue','gray'],
+			    '@extend': '.padded',
+			    'font-family': '$font',
+			    '> #heading': { 'color': '#222' },
+			    '> ul': {
+			      color: '#0467CC',
+			      '> li': {
+			        padding: '2px',
+			      }
+			    }
+			  }
+			});
+
+		</script>
+	 </body>
+
+ </html>

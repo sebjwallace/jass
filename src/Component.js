@@ -9,23 +9,35 @@ export class Component{
 		this.tag = new Tag(this.token.key);
 		this.Store = Store;
 		this.Store.setTag(this.token.key,this.tag);
+		this.styles = null;
 		if (styles) this.setStyles(styles);
 	}
 	setStyles(obj){
+		this.assign(obj);
+
 		const preCompiler = new PreCompiler(this.Store);
 		const compiler = new Compiler(this.Store);
-		preCompiler.parse(obj,this.token.key);
+		preCompiler.parse(this.styles,this.token.key);
 
 		const renderStack = this.Store.getRenderStack();
 		const styleIndex = this.Store.getStyleIndex();
 
 		for(const item in renderStack){
-			const renderItem = renderStack[item];
-			const result = compiler.parse(styleIndex[renderItem],renderItem);
+			const result = compiler.parse(styleIndex[item],item);
 			this.Store.updateTag(item,result);
 		}
 
 		this.Store.emptyRenderStack();
+	}
+	assign(obj){
+		if (!this.styles)
+			this.styles = obj;
+		else
+			for(const selector in obj){
+				for(const attr in obj[selector]){
+					this.styles[selector][attr] = obj[selector][attr];
+				}
+			}
 	}
 	set(obj){
 		this.setStyles(obj);

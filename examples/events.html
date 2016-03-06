@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width">
+	  <title>Reactive Stylesheets</title>
+	</head>
+
+	 <body style="font-family: monospace;">
+
+		<!--
+		 A very quick example to show how to use
+		RSS in a vanilla setup
+		-->
+
+		<!-- a component -->
+		<div id="root">
+		  <div id="content">
+		    <h1>RSS</h1>
+		    <h3>Reactive Style Sheets</h3>
+		    <a href="https://github.com/sebjwallace/RSS">github</a>
+		  </div>
+		  <button>Hide</button>
+		</div>
+
+		<script type="text/javascript" src="../dist/rss.js"></script>
+
+		<script type="text/javascript">
+
+			var rootStyles = new RSS.Component();
+			var root = document.getElementById('root');
+			root.className = rootStyles.className();
+
+			rootStyles.setStyles({
+				'#content': {
+					color: 'green',
+					opacity: 1
+				}
+			});
+
+			rootStyles.setStyles({
+				'#content': {
+					opacity: 0.5
+				}
+			});
+
+			
+		</script>
+	 </body>
+
+ </html>

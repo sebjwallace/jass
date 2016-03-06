@@ -161,26 +161,37 @@ var Component = (function () {
 		this.tag = new _Tag.Tag(this.token.key);
 		this.Store = Store;
 		this.Store.setTag(this.token.key, this.tag);
+		this.styles = null;
 		if (styles) this.setStyles(styles);
 	}
 
 	_createClass(Component, [{
 		key: 'setStyles',
 		value: function setStyles(obj) {
+			this.assign(obj);
+
 			var preCompiler = new _PreCompiler.PreCompiler(this.Store);
 			var compiler = new _Compiler.Compiler(this.Store);
-			preCompiler.parse(obj, this.token.key);
+			preCompiler.parse(this.styles, this.token.key);
 
 			var renderStack = this.Store.getRenderStack();
 			var styleIndex = this.Store.getStyleIndex();
 
 			for (var item in renderStack) {
-				var renderItem = renderStack[item];
-				var result = compiler.parse(styleIndex[renderItem], renderItem);
+				var result = compiler.parse(styleIndex[item], item);
 				this.Store.updateTag(item, result);
 			}
 
 			this.Store.emptyRenderStack();
+		}
+	}, {
+		key: 'assign',
+		value: function assign(obj) {
+			if (!this.styles) this.styles = obj;else for (var selector in obj) {
+				for (var attr in obj[selector]) {
+					this.styles[selector][attr] = obj[selector][attr];
+				}
+			}
 		}
 	}, {
 		key: 'set',
@@ -336,6 +347,7 @@ var Store = function Store() {
 	this.tags = {};
 	this.mixins = {};
 	this.variables = {};
+	this.events = {};
 	this.tokenIndex = {};
 	this.styleIndex = {};
 	this.renderStack = {};

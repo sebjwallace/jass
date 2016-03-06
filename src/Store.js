@@ -5,6 +5,7 @@ export class Store{
 		this.tags = {};
 		this.mixins = {};
 		this.variables = {};
+		this.events = {};
 		this.tokenIndex = {};
 		this.styleIndex = {};
 		this.renderStack = {};
