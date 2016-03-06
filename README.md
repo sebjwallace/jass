@@ -20,10 +20,10 @@
 - Events
 
 ##### What?
-RSS gives the developer the ability to declare and modify CSS at runtime using core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles.
+RSS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles.
 
 ##### Why?
-With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS/LESS used ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty.
+With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS emulated ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty. CSS can even behave reactively to events, all thanks to the JS environment! 
 
 ##### How?
 
