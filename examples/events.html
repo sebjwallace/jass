@@ -27,11 +27,7 @@
 
 		<script type="text/javascript">
 
-			var rootStyles = new RSS.Component();
-			var root = document.getElementById('root');
-			root.className = rootStyles.className();
-
-			rootStyles.setStyles({
+			new RSS.Component('root',{
 				'#content': {
 					opacity: 1,
 					transition: 'all 1s',
@@ -39,7 +35,6 @@
 				}
 			});
 
-			
 		</script>
 	 </body>
 

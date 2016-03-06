@@ -21,8 +21,15 @@ const _Event = (id) => {
 };
 
 class ComponentFacade{
-	constructor(initialStyles){
-		return new _Component(RSSSingleton.Store,initialStyles);
+	constructor(initial,styles){
+		const comp = new _Component(RSSSingleton.Store);
+		if(typeof initial == 'string')
+			document.getElementById(initial).className = comp.className();
+		else if(typeof initial == 'object')
+			comp.setStyles(initial);
+		if(styles)
+			comp.setStyles(styles);
+		return comp;
 	}
 }
 

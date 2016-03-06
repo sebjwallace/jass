@@ -332,10 +332,13 @@ var _Event = function _Event(id) {
 	comp.setStyles(styles);
 };
 
-var ComponentFacade = function ComponentFacade(initialStyles) {
+var ComponentFacade = function ComponentFacade(initial, styles) {
 	_classCallCheck(this, ComponentFacade);
 
-	return new _Component2.Component(RSSSingleton.Store, initialStyles);
+	var comp = new _Component2.Component(RSSSingleton.Store);
+	if (typeof initial == 'string') document.getElementById(initial).className = comp.className();else if (typeof initial == 'object') comp.setStyles(initial);
+	if (styles) comp.setStyles(styles);
+	return comp;
 };
 
 var RSSSingleton = new RSS(new _Store.Store());
