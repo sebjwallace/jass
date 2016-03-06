@@ -3,7 +3,7 @@ import { Store } from './Store';
 
 class RSS{
 	constructor(store){
-		this.store = store;
+		this.Store = store;
 		if(!document.getElementById('rss-container')){
 			let el = document.createElement('div');
 			el.id = 'rss-container';
@@ -13,12 +13,18 @@ class RSS{
 }
 
 export const RSSSingleton = new RSS(new Store);
+export const Event = (id) => {
+	const comp = RSSSingleton.Store.events[id].component;
+	const selector = RSSSingleton.Store.events[id].selector;
+	const styles = {};
+	styles[selector] = RSSSingleton.Store.events[id].styles
+	comp.setStyles(styles);
+};
 
 class ComponentFacade{
 	constructor(initialStyles){
-		return new _Component(RSSSingleton.store,initialStyles);
+		return new _Component(RSSSingleton.Store,initialStyles);
 	}
 }
-
 
 export const Component = ComponentFacade;

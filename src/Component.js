@@ -15,7 +15,7 @@ export class Component{
 	setStyles(obj){
 		this.assign(obj);
 
-		const preCompiler = new PreCompiler(this.Store);
+		const preCompiler = new PreCompiler(this.Store,this);
 		const compiler = new Compiler(this.Store);
 		preCompiler.parse(this.styles,this.token.key);
 
@@ -38,6 +38,9 @@ export class Component{
 					this.styles[selector][attr] = obj[selector][attr];
 				}
 			}
+	}
+	trigger(event){
+
 	}
 	set(obj){
 		this.setStyles(obj);

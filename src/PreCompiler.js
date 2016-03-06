@@ -1,13 +1,15 @@
 import { Style } from './Style';
 
 export class PreCompiler{
-	constructor(Store){
+	constructor(Store,component){
 		this.Store = Store;
+		this.component = component;
 	}
 	parse(obj,key){
 
 		let level = 0;
 		let activeStyle = {};
+		let selector = null;
 
 		const extract = (obj) => {
 			level ++;
@@ -15,8 +17,9 @@ export class PreCompiler{
 			for(const prop in obj){
 
 				if(level == 1){
-					this.Store.styles[prop] = new Style(key, prop, obj[prop]);
-					activeStyle = this.Store.styles[prop];
+					selector = prop;
+					this.Store.styles[selector] = new Style(key, selector, obj[selector]);
+					activeStyle = this.Store.styles[selector];
 					if (!this.Store.tokenIndex[key]) this.Store.tokenIndex[key] = {};
 						this.Store.tokenIndex[key][activeStyle.selector] = (activeStyle);
 					if (!this.Store.styleIndex[key]) this.Store.styleIndex[key] = {};
@@ -39,6 +42,10 @@ export class PreCompiler{
 
 				else if(prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function'){
 					this.Store.mixins[prop.replace(/^\@mixin\s/,'')] = obj[prop];
+				}
+
+				else if(prop.match(/^\@listen$/) && Array.isArray(obj[prop])){
+					this.Store.events[obj[prop][0]] = { component: this.component, selector: selector, styles: obj[prop][1] };
 				}
 
 				if(typeof obj[prop] === 'object'){

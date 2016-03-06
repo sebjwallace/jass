@@ -170,7 +170,7 @@ var Component = (function () {
 		value: function setStyles(obj) {
 			this.assign(obj);
 
-			var preCompiler = new _PreCompiler.PreCompiler(this.Store);
+			var preCompiler = new _PreCompiler.PreCompiler(this.Store, this);
 			var compiler = new _Compiler.Compiler(this.Store);
 			preCompiler.parse(this.styles, this.token.key);
 
@@ -193,6 +193,9 @@ var Component = (function () {
 				}
 			}
 		}
+	}, {
+		key: 'trigger',
+		value: function trigger(event) {}
 	}, {
 		key: 'set',
 		value: function set(obj) {
@@ -234,10 +237,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var _Style = require('./Style');
 
 var PreCompiler = (function () {
-	function PreCompiler(Store) {
+	function PreCompiler(Store, component) {
 		_classCallCheck(this, PreCompiler);
 
 		this.Store = Store;
+		this.component = component;
 	}
 
 	_createClass(PreCompiler, [{
@@ -247,6 +251,7 @@ var PreCompiler = (function () {
 
 			var level = 0;
 			var activeStyle = {};
+			var selector = null;
 
 			var extract = function extract(obj) {
 				level++;
@@ -254,8 +259,9 @@ var PreCompiler = (function () {
 				for (var prop in obj) {
 
 					if (level == 1) {
-						_this.Store.styles[prop] = new _Style.Style(key, prop, obj[prop]);
-						activeStyle = _this.Store.styles[prop];
+						selector = prop;
+						_this.Store.styles[selector] = new _Style.Style(key, selector, obj[selector]);
+						activeStyle = _this.Store.styles[selector];
 						if (!_this.Store.tokenIndex[key]) _this.Store.tokenIndex[key] = {};
 						_this.Store.tokenIndex[key][activeStyle.selector] = activeStyle;
 						if (!_this.Store.styleIndex[key]) _this.Store.styleIndex[key] = {};
@@ -273,6 +279,8 @@ var PreCompiler = (function () {
 						_this.Store.variables[prop] = obj[prop];
 					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
 						_this.Store.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
+					} else if (prop.match(/^\@listen$/) && Array.isArray(obj[prop])) {
+						_this.Store.events[obj[prop][0]] = { component: _this.component, selector: selector, styles: obj[prop][1] };
 					}
 
 					if (typeof obj[prop] === 'object') {
@@ -308,7 +316,7 @@ var _Store = require('./Store');
 var RSS = function RSS(store) {
 	_classCallCheck(this, RSS);
 
-	this.store = store;
+	this.Store = store;
 	if (!document.getElementById('rss-container')) {
 		var el = document.createElement('div');
 		el.id = 'rss-container';
@@ -317,13 +325,21 @@ var RSS = function RSS(store) {
 };
 
 var RSSSingleton = new RSS(new _Store.Store());
-
 exports.RSSSingleton = RSSSingleton;
+var Event = function Event(id) {
+	var comp = RSSSingleton.Store.events[id].component;
+	var selector = RSSSingleton.Store.events[id].selector;
+	var styles = {};
+	styles[selector] = RSSSingleton.Store.events[id].styles;
+	comp.setStyles(styles);
+};
+
+exports.Event = Event;
 
 var ComponentFacade = function ComponentFacade(initialStyles) {
 	_classCallCheck(this, ComponentFacade);
 
-	return new _Component2.Component(RSSSingleton.store, initialStyles);
+	return new _Component2.Component(RSSSingleton.Store, initialStyles);
 };
 
 var Component = ComponentFacade;

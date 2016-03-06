@@ -11,17 +11,16 @@
 
 		<!--
 		 A very quick example to show how to use
-		RSS in a vanilla setup
+		events in RSS
 		-->
 
 		<!-- a component -->
 		<div id="root">
 		  <div id="content">
 		    <h1>RSS</h1>
-		    <h3>Reactive Style Sheets</h3>
-		    <a href="https://github.com/sebjwallace/RSS">github</a>
+		    <h3>Reactive Style Sheets : <a href="https://github.com/sebjwallace/RSS">github</a></h3>
 		  </div>
-		  <button>Hide</button>
+		  <button onclick="RSS.Event('button:click')">Hide</button>
 		</div>
 
 		<script type="text/javascript" src="../dist/rss.js"></script>
@@ -34,14 +33,9 @@
 
 			rootStyles.setStyles({
 				'#content': {
-					color: 'green',
-					opacity: 1
-				}
-			});
-
-			rootStyles.setStyles({
-				'#content': {
-					opacity: 0.5
+					opacity: 1,
+					transition: 'all 1s',
+					'@listen': ['button:click', { opacity: 0 }]
 				}
 			});
 
