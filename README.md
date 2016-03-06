@@ -5,7 +5,8 @@
 #### SASS in a JS environment, super dynamic CSS!
 
 ##### Codepen examples:
-<a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
+- <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
+- <a href="http://codepen.io/sebjwallace/pen/RarbBg?editors=1010" target="_blank">vanilla HTML/JS</a>
 
 ##### Features:
 - Variables
@@ -15,7 +16,7 @@
 - Media Queries
 
 ##### What?
-Making CSS 'reactive' means dynamically declaring & modifying CSS at runtime using Javascript. This does not mean using inline styles, instead it means using the browser's ability to evaluate stylesheets on the fly. This gives back the use of all features available to CSS, but inside Javascript. And better yet, using Javascript to give CSS SASS-like features.
+RSS gives the developer the ability to declare and modify CSS at runtime using core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles.
 
 ##### Why?
 With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS/LESS used ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty.
