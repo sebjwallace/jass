@@ -1,7 +1,9 @@
 import { Component as _Component } from './Component';
+import { Store } from './Store';
 
 class RSS{
-	constructor(){
+	constructor(store){
+		this.store = store;
 		if(!document.getElementById('rss-container')){
 			let el = document.createElement('div');
 			el.id = 'rss-container';
@@ -10,6 +12,13 @@ class RSS{
 	}
 }
 
-export const RSSSingleton = new RSS();
+export const RSSSingleton = new RSS(new Store);
 
-export const Component = _Component;
+class ComponentFacade{
+	constructor(initialStyles){
+		return new _Component(RSSSingleton.store,initialStyles);
+	}
+}
+
+
+export const Component = ComponentFacade;

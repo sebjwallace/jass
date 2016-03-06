@@ -1,7 +1,5 @@
-import { Compiler } from './Compiler';
-import { PreCompiler } from './PreCompiler';
 
-class StoreSingleton{
+export class Store{
 	constructor(){
 		this.styles = {};
 		this.tags = {};
@@ -10,23 +8,21 @@ class StoreSingleton{
 		this.tokenIndex = {};
 		this.styleIndex = {};
 		this.renderStack = {};
-	}
-	setStyles(styles,token,tag){
-		this.tags[token.key] = tag;
-		this.compile(styles,token);
-	}
-	compile(styles,token){
-		const preCompiler = new PreCompiler(this);
-		preCompiler.parse(styles,token);
-		for(let item in this.renderStack){
-			const compiler = new Compiler(this);
-			const result = compiler
-				.parse(this.styleIndex[this.renderStack[item]],this.renderStack[item]);
-			//console.log(result);
-			this.tags[item].update(result);
+
+		this.setTag = (id,tag) => {
+			this.tags[id] = tag;
 		}
-		this.renderStack = {};
+		this.updateTag = (id,content) => {
+			this.tags[id].update(content);
+		}
+		this.getRenderStack = () => {
+			return this.renderStack;
+		}
+		this.getStyleIndex = () => {
+			return this.styleIndex;
+		}
+		this.emptyRenderStack = () => {
+			this.renderStack = {};
+		}
 	}
 }
-
-export const Store = new StoreSingleton;

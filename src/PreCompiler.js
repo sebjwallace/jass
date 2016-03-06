@@ -4,7 +4,7 @@ export class PreCompiler{
 	constructor(Store){
 		this.Store = Store;
 	}
-	parse(obj,token){
+	parse(obj,key){
 
 		let level = 0;
 		let activeStyle = {};
@@ -15,12 +15,12 @@ export class PreCompiler{
 			for(const prop in obj){
 
 				if(level == 1){
-					this.Store.styles[prop] = new Style(token.key, prop, obj[prop]);
+					this.Store.styles[prop] = new Style(key, prop, obj[prop]);
 					activeStyle = this.Store.styles[prop];
-					if (!this.Store.tokenIndex[token.key]) this.Store.tokenIndex[token.key] = {};
-						this.Store.tokenIndex[token.key][activeStyle.selector] = (activeStyle);
-					if (!this.Store.styleIndex[token.key]) this.Store.styleIndex[token.key] = {};
-						this.Store.styleIndex[token.key][activeStyle.selector] = (activeStyle.body);
+					if (!this.Store.tokenIndex[key]) this.Store.tokenIndex[key] = {};
+						this.Store.tokenIndex[key][activeStyle.selector] = (activeStyle);
+					if (!this.Store.styleIndex[key]) this.Store.styleIndex[key] = {};
+						this.Store.styleIndex[key][activeStyle.selector] = (activeStyle.body);
 				}
 
 				if(prop.match(/^\@extend($|[0-9])/)){
@@ -48,7 +48,7 @@ export class PreCompiler{
 			level --;
 		}
 		extract(obj);
-		this.Store.renderStack[token.key] = token.key;
+		this.Store.renderStack[key] = key;
 		//console.log(this);
 	}
 }

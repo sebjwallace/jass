@@ -149,23 +149,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var _Token = require('./Token');
 
-var _Store = require('./Store');
-
 var _Tag = require('./Tag');
 
+var _Compiler = require('./Compiler');
+
+var _PreCompiler = require('./PreCompiler');
+
 var Component = (function () {
-	function Component(styles) {
+	function Component(Store, styles) {
 		_classCallCheck(this, Component);
 
 		this.token = new _Token.Token();
 		this.tag = new _Tag.Tag(this.token.key);
+		this.Store = Store;
+		this.Store.setTag(this.token.key, this.tag);
 		if (styles) this.setStyles(styles);
 	}
 
 	_createClass(Component, [{
 		key: 'setStyles',
 		value: function setStyles(obj) {
-			_Store.Store.setStyles(obj, this.token, this.tag);
+			var preCompiler = new _PreCompiler.PreCompiler(this.Store);
+			var compiler = new _Compiler.Compiler(this.Store);
+			preCompiler.parse(obj, this.token.key);
+
+			var renderStack = this.Store.getRenderStack();
+			var styleIndex = this.Store.getStyleIndex();
+
+			for (var item in renderStack) {
+				var renderItem = renderStack[item];
+				var result = compiler.parse(styleIndex[renderItem], renderItem);
+				this.Store.updateTag(item, result);
+			}
+
+			this.Store.emptyRenderStack();
 		}
 	}, {
 		key: 'set',
@@ -187,11 +204,6 @@ var Component = (function () {
 		value: function className() {
 			return this.token.key;
 		}
-	}, {
-		key: 'getToken',
-		value: function getToken() {
-			return this.token.key;
-		}
 	}]);
 
 	return Component;
@@ -199,7 +211,7 @@ var Component = (function () {
 
 exports.Component = Component;
 
-},{"./Store":5,"./Tag":7,"./Token":8}],3:[function(require,module,exports){
+},{"./Compiler":1,"./PreCompiler":3,"./Tag":7,"./Token":8}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -221,7 +233,7 @@ var PreCompiler = (function () {
 
 	_createClass(PreCompiler, [{
 		key: 'parse',
-		value: function parse(obj, token) {
+		value: function parse(obj, key) {
 			var _this = this;
 
 			var level = 0;
@@ -233,12 +245,12 @@ var PreCompiler = (function () {
 				for (var prop in obj) {
 
 					if (level == 1) {
-						_this.Store.styles[prop] = new _Style.Style(token.key, prop, obj[prop]);
+						_this.Store.styles[prop] = new _Style.Style(key, prop, obj[prop]);
 						activeStyle = _this.Store.styles[prop];
-						if (!_this.Store.tokenIndex[token.key]) _this.Store.tokenIndex[token.key] = {};
-						_this.Store.tokenIndex[token.key][activeStyle.selector] = activeStyle;
-						if (!_this.Store.styleIndex[token.key]) _this.Store.styleIndex[token.key] = {};
-						_this.Store.styleIndex[token.key][activeStyle.selector] = activeStyle.body;
+						if (!_this.Store.tokenIndex[key]) _this.Store.tokenIndex[key] = {};
+						_this.Store.tokenIndex[key][activeStyle.selector] = activeStyle;
+						if (!_this.Store.styleIndex[key]) _this.Store.styleIndex[key] = {};
+						_this.Store.styleIndex[key][activeStyle.selector] = activeStyle.body;
 					}
 
 					if (prop.match(/^\@extend($|[0-9])/)) {
@@ -261,7 +273,7 @@ var PreCompiler = (function () {
 				level--;
 			};
 			extract(obj);
-			this.Store.renderStack[token.key] = token.key;
+			this.Store.renderStack[key] = key;
 			//console.log(this);
 		}
 	}]);
@@ -282,9 +294,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var _Component2 = require('./Component');
 
-var RSS = function RSS() {
+var _Store = require('./Store');
+
+var RSS = function RSS(store) {
 	_classCallCheck(this, RSS);
 
+	this.store = store;
 	if (!document.getElementById('rss-container')) {
 		var el = document.createElement('div');
 		el.id = 'rss-container';
@@ -292,68 +307,61 @@ var RSS = function RSS() {
 	}
 };
 
-var RSSSingleton = new RSS();
+var RSSSingleton = new RSS(new _Store.Store());
 
 exports.RSSSingleton = RSSSingleton;
-var Component = _Component2.Component;
+
+var ComponentFacade = function ComponentFacade(initialStyles) {
+	_classCallCheck(this, ComponentFacade);
+
+	return new _Component2.Component(RSSSingleton.store, initialStyles);
+};
+
+var Component = ComponentFacade;
 exports.Component = Component;
 
-},{"./Component":2}],5:[function(require,module,exports){
-'use strict';
+},{"./Component":2,"./Store":5}],5:[function(require,module,exports){
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+var Store = function Store() {
+	var _this = this;
 
-var _Compiler = require('./Compiler');
+	_classCallCheck(this, Store);
 
-var _PreCompiler = require('./PreCompiler');
+	this.styles = {};
+	this.tags = {};
+	this.mixins = {};
+	this.variables = {};
+	this.tokenIndex = {};
+	this.styleIndex = {};
+	this.renderStack = {};
 
-var StoreSingleton = (function () {
-	function StoreSingleton() {
-		_classCallCheck(this, StoreSingleton);
+	this.setTag = function (id, tag) {
+		_this.tags[id] = tag;
+	};
+	this.updateTag = function (id, content) {
+		_this.tags[id].update(content);
+	};
+	this.getRenderStack = function () {
+		return _this.renderStack;
+	};
+	this.getStyleIndex = function () {
+		return _this.styleIndex;
+	};
+	this.emptyRenderStack = function () {
+		_this.renderStack = {};
+	};
+};
 
-		this.styles = {};
-		this.tags = {};
-		this.mixins = {};
-		this.variables = {};
-		this.tokenIndex = {};
-		this.styleIndex = {};
-		this.renderStack = {};
-	}
-
-	_createClass(StoreSingleton, [{
-		key: 'setStyles',
-		value: function setStyles(styles, token, tag) {
-			this.tags[token.key] = tag;
-			this.compile(styles, token);
-		}
-	}, {
-		key: 'compile',
-		value: function compile(styles, token) {
-			var preCompiler = new _PreCompiler.PreCompiler(this);
-			preCompiler.parse(styles, token);
-			for (var item in this.renderStack) {
-				var compiler = new _Compiler.Compiler(this);
-				var result = compiler.parse(this.styleIndex[this.renderStack[item]], this.renderStack[item]);
-				//console.log(result);
-				this.tags[item].update(result);
-			}
-			this.renderStack = {};
-		}
-	}]);
-
-	return StoreSingleton;
-})();
-
-var Store = new StoreSingleton();
 exports.Store = Store;
 
-},{"./Compiler":1,"./PreCompiler":3}],6:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -410,12 +418,6 @@ var Tag = (function () {
 		key: 'update',
 		value: function update(stringified) {
 			this.tag.innerHTML = stringified;
-			// console.log(stringified);
-			// for (var i=0; i < document.styleSheets.length; i++){
-			// 	if(document.styleSheets[i].ownerNode ==  this.tag){
-			// 		document.styleSheets[i].insertRule(stringified,0);
-			// 	}
-			// }
 		}
 	}]);
 
@@ -460,5 +462,3 @@ exports.Token = Token;
 
 },{}]},{},[4])(4)
 });
-
-var RSS = RSS;
