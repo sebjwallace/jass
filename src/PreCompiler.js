@@ -40,12 +40,13 @@ export class PreCompiler{
 					this.Store.variables[prop] = obj[prop];
 				}
 
-				else if(prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function'){
+				else if(prop.match(/^\@mixin\s+[^]+$/) && typeof obj[prop] === 'function'){
 					this.Store.mixins[prop.replace(/^\@mixin\s/,'')] = obj[prop];
 				}
 
-				else if(prop.match(/^\@event$/) && Array.isArray(obj[prop])){
-					this.Store.events[obj[prop][0]] = { component: this.component, selector: selector, styles: obj[prop][1] };
+				else if(prop.match(/^\@event\s+[^]+$/)){
+					const event = prop.replace(/^\@event\s+/,'');
+					this.Store.events[event] = { component: this.component, selector: selector, styles: obj[prop] };
 				}
 
 				if(typeof obj[prop] === 'object'){

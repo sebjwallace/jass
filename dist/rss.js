@@ -277,10 +277,11 @@ var PreCompiler = (function () {
 						}
 					} else if (prop.match(/^\$[a-z,A-Z]+$/)) {
 						_this.Store.variables[prop] = obj[prop];
-					} else if (prop.match(/^\@mixin\s[^]/) && typeof obj[prop] === 'function') {
+					} else if (prop.match(/^\@mixin\s+[^]+$/) && typeof obj[prop] === 'function') {
 						_this.Store.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
-					} else if (prop.match(/^\@event$/) && Array.isArray(obj[prop])) {
-						_this.Store.events[obj[prop][0]] = { component: _this.component, selector: selector, styles: obj[prop][1] };
+					} else if (prop.match(/^\@event\s+[^]+$/)) {
+						var _event = prop.replace(/^\@event\s+/, '');
+						_this.Store.events[_event] = { component: _this.component, selector: selector, styles: obj[prop] };
 					}
 
 					if (typeof obj[prop] === 'object') {
@@ -313,10 +314,29 @@ var _Component2 = require('./Component');
 
 var _Store = require('./Store');
 
-var RSS = function RSS(store) {
-	_classCallCheck(this, RSS);
+var ComponentFacade = function ComponentFacade(initial, styles) {
+	_classCallCheck(this, ComponentFacade);
+
+	var comp = new _Component2.Component(RSS.Store);
+	if (typeof initial == 'string') document.getElementById(initial).className = comp.className();else if (typeof initial == 'object') comp.setStyles(initial);
+	if (styles) comp.setStyles(styles);
+	return comp;
+};
+
+var _Event = function _Event(id) {
+	var comp = RSS.Store.events[id].component;
+	var selector = RSS.Store.events[id].selector;
+	var styles = {};
+	styles[selector] = RSS.Store.events[id].styles;
+	comp.setStyles(styles);
+};
+
+var _RSS = function _RSS(store) {
+	_classCallCheck(this, _RSS);
 
 	this.Store = store;
+	this.Component = ComponentFacade;
+	this.Event = _Event;
 	if (!document.getElementById('rss-container')) {
 		var el = document.createElement('div');
 		el.id = 'rss-container';
@@ -324,25 +344,8 @@ var RSS = function RSS(store) {
 	}
 };
 
-var _Event = function _Event(id) {
-	var comp = RSSSingleton.Store.events[id].component;
-	var selector = RSSSingleton.Store.events[id].selector;
-	var styles = {};
-	styles[selector] = RSSSingleton.Store.events[id].styles;
-	comp.setStyles(styles);
-};
-
-var ComponentFacade = function ComponentFacade(initial, styles) {
-	_classCallCheck(this, ComponentFacade);
-
-	var comp = new _Component2.Component(RSSSingleton.Store);
-	if (typeof initial == 'string') document.getElementById(initial).className = comp.className();else if (typeof initial == 'object') comp.setStyles(initial);
-	if (styles) comp.setStyles(styles);
-	return comp;
-};
-
-var RSSSingleton = new RSS(new _Store.Store());
-exports.RSSSingleton = RSSSingleton;
+var RSS = new _RSS(new _Store.Store());
+exports.RSS = RSS;
 var Component = ComponentFacade;
 exports.Component = Component;
 var Event = _Event;

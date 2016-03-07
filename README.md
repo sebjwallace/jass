@@ -2,7 +2,7 @@
 ![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
 ---
 "# rss" 
-#### SASS in a JS environment, super dynamic CSS!
+#### SASS in the JS environment, super dynamic CSS!
 
 ##### Codepen examples:
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
@@ -16,32 +16,35 @@
 - Nesting / Grouping
 - Media Queries
 
-##### RSS-Specific Features
+###### RSS-Specific Features
 - Events
 
 ##### What?
-RSS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles.
+RSS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles. Just use the CSS syntax you're familiar with but using object literals.
 
 ##### Why?
-With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS emulated ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty. CSS can even behave reactively to events, all thanks to the JS environment! 
+With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS emulated ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty. With RSS, CSS can react to events, eliminating tedious bloat code.
 
 ##### How?
+Simply include RSS, instantiate a RSS.Component, and use the Component instance method setStyles({ /* styles declared as object literal */ }). All of the API is inside the setStyles method using object literal syntax. The only additional (and optional) method is RSS.Event().
 
-The following examples will use React to demonstrate RSS features, although RSS could be used with any Framework, or by itself.
+Explore the Codepen exmaples and the ones below for more detail.
+
+The following examples will use React to demonstrate RSS features, although RSS could be used with any Framework, or simply using vanilla Javascript.
 
 Include via stript tag
 ```html
-  <script src="../dist/rss.js"></script>
+  <script src="path.../dist/rss.js"></script>
 ```
 
-<a href="https://www.npmjs.com/package/rss-js">NPM link</a>
+<a href="https://www.npmjs.com/package/rss-js">NPM | rss-js</a>
 
 Include via Browserify or ES6
 ```javascript
 // browserify
-const RSS = require('rss');
+const RSS = require('rss-js');
 // es6
-import { RSS } from 'path/rss.js';
+import { RSS } from 'rss-js';
 ```
 
 Instantiate:
@@ -224,7 +227,7 @@ class MessageBox{
 
 ###### Events
 
-Styles can be modified in reaction to events. All thats needed is a listener declared in the styles declaration and a trigger. A trigger can be called from anywhere in the project where the global RSS object is available.
+Styles can be modified on events within the project. All that's needed is a listener and a trigger. The listener is defined within a selector, and a trigger is used anywhere within the project where the RSS object is available.
 
 ```javascript
 render(){
@@ -233,21 +236,21 @@ render(){
         opacity: 1,
         // an event listener, listening to 'hide'
         // when that event triggers the opacity will be set to 0
-        '@event': ['hide', { opacity: 0 } ]
+        '@event hide': { opacity: 0 }
       },
       // ...
     });
     return (
       <div className={this.styles.className()} onClick={this.handleClick}>
         // ...
-        // the trigger is binded to the click event
+        // the trigger is bound to the click event
         <button onClick={ RSS.Event('hide') }>Hide</button>
       </div>
     )
   }
 ```
 
-An event declaration requires an array with the first element/argument being the name of the event, and the second being an object literal with the styles to be modified. Its important to note that the event is only scoped to the selector its defined in - in the above example it was BASE.
+Multiple selectors can listen to a single event, and a single selector can listen to multiple events. Its important to note that the event is only scoped to the selector its defined in - in the above example it was BASE.
 
 ###### Media Queries
 
