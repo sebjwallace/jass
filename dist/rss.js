@@ -24,9 +24,24 @@ var Compiler = (function () {
 			return check.match(/\@media/);
 		}
 	}, {
+		key: 'isEvent',
+		value: function isEvent(check) {
+			return check.match(/^\@event\s+[^]+$/);
+		}
+	}, {
+		key: 'isBind',
+		value: function isBind(check) {
+			return check.match(/^\@bind\s+[^]+$/);
+		}
+	}, {
 		key: 'isExtend',
 		value: function isExtend(check) {
 			return check.match(/^\@extend($|[0-9])/);
+		}
+	}, {
+		key: 'isVariableScope',
+		value: function isVariableScope(check) {
+			return check.match(/^\$/);
 		}
 	}, {
 		key: 'isVariable',
@@ -62,7 +77,7 @@ var Compiler = (function () {
 		}
 	}, {
 		key: 'generateValue',
-		value: function generateValue(value) {
+		value: function generateValue(value, scope, selector, attr) {
 			if (this.isVariable(value)) return this.Store.variables[value];else return value;
 		}
 	}, {
@@ -84,7 +99,7 @@ var Compiler = (function () {
 
 				for (var props in obj) {
 
-					if (_this.isVariable(props)) continue;
+					if (_this.isVariableScope(props) || _this.isEvent(props) || _this.isBind(props)) continue;
 
 					if (level == 1 && !_this.isMediaQuery(props)) {
 						parentID = props;
@@ -109,7 +124,7 @@ var Compiler = (function () {
 							sum += "}";
 						} else {
 							sum += groupingID + props;
-							sum += ":" + _this.generateValue(obj[props]) + ";";
+							sum += ":" + _this.generateValue(obj[props], scope, parentID, props) + ";";
 						}
 					}
 				}
@@ -189,13 +204,16 @@ var Component = (function () {
 		value: function assign(obj) {
 			if (!this.styles) this.styles = obj;else for (var selector in obj) {
 				for (var attr in obj[selector]) {
-					this.styles[selector][attr] = obj[selector][attr];
+					var existing = this.styles[selector][attr];
+					var override = obj[selector][attr];
+					if (Array.isArray(override)) {
+						if (override[0] == existing) this.styles[selector][attr] = override[1];else this.styles[selector][attr] = override[0];
+					} else {
+						this.styles[selector][attr] = override;
+					}
 				}
 			}
 		}
-	}, {
-		key: 'trigger',
-		value: function trigger(event) {}
 	}, {
 		key: 'set',
 		value: function set(obj) {
@@ -235,6 +253,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _Style = require('./Style');
+
+var _RSS = require('./RSS');
 
 var PreCompiler = (function () {
 	function PreCompiler(Store, component) {
@@ -280,8 +300,27 @@ var PreCompiler = (function () {
 					} else if (prop.match(/^\@mixin\s+[^]+$/) && typeof obj[prop] === 'function') {
 						_this.Store.mixins[prop.replace(/^\@mixin\s/, '')] = obj[prop];
 					} else if (prop.match(/^\@event\s+[^]+$/)) {
-						var _event = prop.replace(/^\@event\s+/, '');
-						_this.Store.events[_event] = { component: _this.component, selector: selector, styles: obj[prop] };
+						var id = prop.replace(/^\@event\s+/, '');
+						var _event = { component: _this.component, selector: selector, styles: obj[prop] };
+						if (!_this.Store.events[id]) _this.Store.events[id] = {};
+						if (!_this.Store.events[id][selector]) _this.Store.events[id][selector] = _event;
+					} else if (prop.match(/^\@bind\s+[^]+$/)) {
+						var el = null;
+						if (selector == 'BASE') {
+							el = document.getElementByClassName(key)[0];
+						} else {
+							el = document.getElementById(selector.replace('#', ''));
+						}
+						var _event2 = prop.replace(/^\@bind\s+/, '');
+						var fn = obj[prop];
+						if (typeof fn == 'string') {
+							(function () {
+								var eventId = fn.replace(/^\@event\s+/, '');
+								el[_event2] = function () {
+									_RSS.RSS.Event(eventId);
+								};
+							})();
+						} else el[_event2] = fn;
 					}
 
 					if (typeof obj[prop] === 'object') {
@@ -301,7 +340,7 @@ var PreCompiler = (function () {
 
 exports.PreCompiler = PreCompiler;
 
-},{"./Style":6}],4:[function(require,module,exports){
+},{"./RSS":4,"./Style":6}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -324,11 +363,14 @@ var ComponentFacade = function ComponentFacade(initial, styles) {
 };
 
 var _Event = function _Event(id) {
-	var comp = RSS.Store.events[id].component;
-	var selector = RSS.Store.events[id].selector;
-	var styles = {};
-	styles[selector] = RSS.Store.events[id].styles;
-	comp.setStyles(styles);
+	var event = RSS.Store.events[id];
+	for (var listener in event) {
+		var comp = event[listener].component;
+		var selector = event[listener].selector;
+		var styles = {};
+		styles[selector] = event[listener].styles;
+		comp.setStyles(styles);
+	}
 };
 
 var _RSS = function _RSS(store) {

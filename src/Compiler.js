@@ -6,8 +6,17 @@ export class Compiler{
 	isMediaQuery(check){
 		return check.match(/\@media/);
 	}
+	isEvent(check){
+		return check.match(/^\@event\s+[^]+$/);
+	}
+	isBind(check){
+		return check.match(/^\@bind\s+[^]+$/);
+	}
 	isExtend(check){
 		return check.match(/^\@extend($|[0-9])/);
+	}
+	isVariableScope(check){
+		return check.match(/^\$/);
 	}
 	isVariable(check){
 		if(typeof check != 'string')
@@ -35,7 +44,7 @@ export class Compiler{
 			.replace(/\s+\:/,':')
 			.replace('BASE','');
 	}
-	generateValue(value){
+	generateValue(value,scope,selector,attr){
 		if(this.isVariable(value))
 			return this.Store.variables[value];
 		else return value;
@@ -57,7 +66,7 @@ export class Compiler{
 
 			for(const props in obj){
 
-				if(this.isVariable(props)) continue;
+				if(this.isVariableScope(props) || this.isEvent(props) || this.isBind(props)) continue;
 
 				if(level == 1 && !this.isMediaQuery(props)){
 					parentID = props;
@@ -93,7 +102,7 @@ export class Compiler{
 						sum += "}";
 					} else{
 						sum += groupingID + props;
-						sum += ":" + this.generateValue(obj[props]) + ";";
+						sum += ":" + this.generateValue(obj[props],scope,parentID,props) + ";";
 					}
 				}
 			}

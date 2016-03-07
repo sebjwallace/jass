@@ -20,7 +20,7 @@
 		    <h1>RSS</h1>
 		    <h3>Reactive Style Sheets : <a href="https://github.com/sebjwallace/RSS">github</a></h3>
 		  </div>
-		  <button onclick="RSS.Event('hide')">Hide</button>
+		  <button id="toggle-button">Toggle</button>
 		</div>
 
 		<script type="text/javascript" src="../dist/rss.js"></script>
@@ -31,7 +31,10 @@
 				'#content': {
 					opacity: 1,
 					transition: 'all 1s',
-					'@event hide': { opacity: 0 }
+					'@event toggle': { opacity: [0,1] }
+				},
+				'#toggle-button': {
+					'@bind onclick': '@event toggle'
 				}
 			});
 

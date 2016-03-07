@@ -15,11 +15,14 @@ class ComponentFacade{
 }
 
 const _Event = (id) => {
-	const comp = RSS.Store.events[id].component;
-	const selector = RSS.Store.events[id].selector;
-	const styles = {};
-	styles[selector] = RSS.Store.events[id].styles
-	comp.setStyles(styles);
+	const event = RSS.Store.events[id];
+	for(const listener in event){
+		const comp = event[listener].component;
+		const selector = event[listener].selector;
+		const styles = {};
+		styles[selector] = event[listener].styles
+		comp.setStyles(styles);
+	}
 };
 
 class _RSS{

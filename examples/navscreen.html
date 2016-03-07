@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width">
+	  <title>Reactive Stylesheets</title>
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	</head>
+
+	 <body style="
+	 	font-family: monospace;
+		padding:0;
+		margin:0;
+		background-color: #dbdbdb;
+	 ">
+
+		<nav id="nav">
+	 		<div id="button" class="fa fa-bars"></div>
+	 		<div id="content">
+		 		<a href="">Home</a>
+				<a href="">About</a>
+				<a href="">Stuff</a>
+				<a href="">Contact</a>
+	 		</div>
+		</nav>
+
+		<script type="text/javascript" src="../dist/rss.js"></script>
+		<script type="text/javascript">
+
+			new RSS.Component('nav',{
+				'BASE': {
+					position: 'fixed',
+					height: '100%',
+					width: 0,
+					transition: 'width 0.7s',
+					'@event toggle:menu': { width: [0,'100%'] }
+				},
+				'#content':{
+					height: '100%',
+					'padding': '50px',
+					'background-color': 'white',
+					'text-align': 'center',
+					opacity: 0,
+					transition: 'opacity 0.3s',
+					'@event toggle:menu': { opacity: [0,1] },
+					'> a': {
+						display: 'block',
+						'font-size': '1.4em',
+						'margin-bottom': '10px'
+					}
+				},
+				'#button': {
+					position: 'absolute',
+					'font-size': '2em',
+					padding: '20px',
+					'z-index': 9999,
+					transition: 'font-size 0.2s',
+					'> :hover': { 'font-size': '2.4em' },
+					'@bind onclick': '@event toggle:menu'
+				}
+			});
+
+		</script>
+	 </body>
+
+ </html>

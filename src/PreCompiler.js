@@ -1,4 +1,5 @@
 import { Style } from './Style';
+import { RSS } from './RSS';
 
 export class PreCompiler{
 	constructor(Store,component){
@@ -45,8 +46,23 @@ export class PreCompiler{
 				}
 
 				else if(prop.match(/^\@event\s+[^]+$/)){
-					const event = prop.replace(/^\@event\s+/,'');
-					this.Store.events[event] = { component: this.component, selector: selector, styles: obj[prop] };
+					const id = prop.replace(/^\@event\s+/,'');
+					const event = { component: this.component, selector: selector, styles: obj[prop] };
+					if(!this.Store.events[id]) this.Store.events[id] = {};
+					if(!this.Store.events[id][selector]) this.Store.events[id][selector] = event;
+				}
+
+				else if(prop.match(/^\@bind\s+[^]+$/)){
+					let el = null;
+					if(selector == 'BASE'){ el = document.getElementByClassName(key)[0] }
+					else{ el = document.getElementById(selector.replace('#','')) }
+					const event = prop.replace(/^\@bind\s+/,'');
+					const fn = obj[prop];
+					if(typeof fn == 'string'){
+						const eventId = fn.replace(/^\@event\s+/,'');
+						el[event] = () => { RSS.Event(eventId); };
+					}
+					else el[event] = fn;
 				}
 
 				if(typeof obj[prop] === 'object'){

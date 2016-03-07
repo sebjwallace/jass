@@ -8,6 +8,7 @@
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 - <a href="http://codepen.io/sebjwallace/pen/RarbBg?editors=1010" target="_blank">vanilla HTML/JS</a>
 - <a href="http://codepen.io/sebjwallace/pen/GZogLZ?editors=1010" target="_blank">click event </a>
+- <a href="http://codepen.io/sebjwallace/pen/mPVpgJ?editors=1010">nav menu - events and bindings</a>
 
 ##### Features:
 - Variables
@@ -18,6 +19,7 @@
 
 ###### RSS-Specific Features
 - Events
+- Bindings
 
 ##### What?
 RSS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles. Just use the CSS syntax you're familiar with but using object literals.
@@ -232,6 +234,7 @@ Styles can be modified on events within the project. All that's needed is a list
 ```javascript
 render(){
     this.styles.set({
+
       BASE:{
         opacity: 1,
         // an event listener, listening to 'hide'
@@ -251,6 +254,35 @@ render(){
 ```
 
 Multiple selectors can listen to a single event, and a single selector can listen to multiple events. Its important to note that the event is only scoped to the selector its defined in - in the above example it was BASE.
+
+Toggling is quite a common task, so there's a bit of syntax sugar for that.
+
+```javascript
+  display: 'block',
+  '@event toggle': { display: ['block','none'] }
+```
+
+If an array of two values is assigned to a style attribute each value will be compared to the current value. The value that doesn't match will be assigned the new value. In the above example, if this was the first 'toggle' event to be fired the new 'display' will be 'none'.
+
+Note, the 'toggle' id is not required for this event. It could be any event handle '@event messageToggle', for example.
+
+###### Bindings
+
+A selector can do more than just listen for events, it can trigger them too. Like a listener, a trigger is defined within a selector.
+
+```javascript
+  '#hide-button': {
+    // the 'hide' event is bound to the 'onclick' callback of the '#hide-button' element
+    '@bind onclick': '@event hide',
+    // any DOM events on the element can be bound
+    // any function can also be assigned (instead of an '@event')
+    '@bind onmouseover': function(){ console.log('hovering...') }
+  }
+```
+
+Bindings can be useful if RSS.Event cannot be called from HTML (like the above example for Events).
+
+<a href="http://codepen.io/sebjwallace/pen/mPVpgJ?editors=1010">Example of events and bindings</a>
 
 ###### Media Queries
 
