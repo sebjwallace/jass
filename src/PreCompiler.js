@@ -1,5 +1,5 @@
-import { Style } from './Style';
 import { RSS } from './RSS';
+import * as Types from './Types/Module';
 
 export class PreCompiler{
 	constructor(Store,component){
@@ -19,51 +19,39 @@ export class PreCompiler{
 
 				if(level == 1){
 					selector = prop;
-					this.Store.styles[selector] = new Style(key, selector, obj[selector]);
-					activeStyle = this.Store.styles[selector];
-					if (!this.Store.tokenIndex[key]) this.Store.tokenIndex[key] = {};
-						this.Store.tokenIndex[key][activeStyle.selector] = (activeStyle);
-					if (!this.Store.styleIndex[key]) this.Store.styleIndex[key] = {};
-						this.Store.styleIndex[key][activeStyle.selector] = (activeStyle.body);
+					this.Store.addStyle(key, selector, obj[selector]);
+					activeStyle = this.Store.getStyle(selector);
+					this.Store.registerToken(key,activeStyle.selector,activeStyle);	
+					this.Store.registerStyle(key,activeStyle.selector,activeStyle.body);
 				}
 
-				if(prop.match(/^\@extend($|[0-9])/)){
-					const parent = this.Store.styles[obj[prop]];
-					if(!parent) console.log( `'${obj[prop]}' cannot be extended because it does not exist!`);
-					else{
-						activeStyle.parents[obj[prop]] = obj[prop];
-						parent.children['.' + activeStyle.token + '&' + activeStyle.selector] = true;
-						this.Store.renderStack[parent.token] = parent.token;
+					if(Types.Extend.isExtend(prop)){
+						const parent = this.Store.getStyle(obj[prop]);
+						if(parent){
+							activeStyle.addParent(obj[prop]);
+							parent.addChild('.' + activeStyle.token + '&' + activeStyle.selector);
+							this.Store.addToRenderStack(parent.token);
+						}
 					}
-				}
 
-				else if(prop.match(/^\$[a-z,A-Z]+$/)){
-					this.Store.variables[prop] = obj[prop];
-				}
-
-				else if(prop.match(/^\@mixin\s+[^]+$/) && typeof obj[prop] === 'function'){
-					this.Store.mixins[prop.replace(/^\@mixin\s/,'')] = obj[prop];
-				}
-
-				else if(prop.match(/^\@event\s+[^]+$/)){
-					const id = prop.replace(/^\@event\s+/,'');
-					const event = { component: this.component, selector: selector, styles: obj[prop] };
-					if(!this.Store.events[id]) this.Store.events[id] = {};
-					if(!this.Store.events[id][selector]) this.Store.events[id][selector] = event;
-				}
-
-				else if(prop.match(/^\@bind\s+[^]+$/)){
-					let el = null;
-					if(selector == 'BASE'){ el = document.getElementByClassName(key)[0] }
-					else{ el = document.getElementById(selector.replace('#','')) }
-					const event = prop.replace(/^\@bind\s+/,'');
-					const fn = obj[prop];
-					if(typeof fn == 'string'){
-						const eventId = fn.replace(/^\@event\s+/,'');
-						el[event] = () => { RSS.Event(eventId); };
+					else if(Types.Variable.isVariable(prop)){
+						this.Store.addVariable(prop,obj[prop]);
 					}
-					else el[event] = fn;
-				}
+
+					else if(Types.Mixin.isMixin(prop) && typeof obj[prop] === 'function'){
+						this.Store.addMixin(Types.Mixin.format(prop),obj[prop]);
+					}
+
+					else if(Types.Event.isEvent(prop)){
+						const id = Types.Event.format(prop);
+						const event = { component: this.component, selector: selector, styles: obj[prop] };
+						this.Store.addEvent(id,selector,event);
+					}
+
+					else if(Types.Binding.isBinding(prop)){
+						const binding = new Types.Binding(selector,key,prop,obj[prop]);
+						this.Store.addBinding(binding);
+					}
 
 				if(typeof obj[prop] === 'object'){
 					extract(obj[prop]);
@@ -72,7 +60,6 @@ export class PreCompiler{
 			level --;
 		}
 		extract(obj);
-		this.Store.renderStack[key] = key;
-		//console.log(this);
+		this.Store.addToRenderStack(key);
 	}
 }

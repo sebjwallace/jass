@@ -2,22 +2,24 @@ import { Token } from './Token';
 import { Tag } from './Tag';
 import { Compiler } from './Compiler';
 import { PreCompiler } from './PreCompiler';
+import { StyleSheet } from './StyleSheet';
 
 export class Component{
 	constructor(Store,styles){
-		this.token = new Token();
+		this.token = new Token;
 		this.tag = new Tag(this.token.key);
+		this.stylesheet = new StyleSheet;
+
 		this.Store = Store;
-		this.Store.setTag(this.token.key,this.tag);
-		this.styles = null;
+		this.Store.registerTag(this.token.key,this.tag);
 		if (styles) this.setStyles(styles);
 	}
 	setStyles(obj){
-		this.assign(obj);
+		this.stylesheet.set(obj);
 
 		const preCompiler = new PreCompiler(this.Store,this);
 		const compiler = new Compiler(this.Store);
-		preCompiler.parse(this.styles,this.token.key);
+		preCompiler.parse(this.stylesheet.get(),this.token.key);
 
 		const renderStack = this.Store.getRenderStack();
 		const styleIndex = this.Store.getStyleIndex();
@@ -28,25 +30,6 @@ export class Component{
 		}
 
 		this.Store.emptyRenderStack();
-	}
-	assign(obj){
-		if (!this.styles)
-			this.styles = obj;
-		else
-			for(const selector in obj){
-				for(const attr in obj[selector]){
-					let existing = this.styles[selector][attr];
-					const override = obj[selector][attr];
-					if(Array.isArray(override)){
-						if(override[0] == existing)
-							this.styles[selector][attr] = override[1];
-						else this.styles[selector][attr] = override[0];
-					}
-					else{
-						this.styles[selector][attr] = override;
-					}
-				}
-			}
 	}
 	set(obj){
 		this.setStyles(obj);

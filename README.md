@@ -8,7 +8,7 @@
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 - <a href="http://codepen.io/sebjwallace/pen/RarbBg?editors=1010" target="_blank">vanilla HTML/JS</a>
 - <a href="http://codepen.io/sebjwallace/pen/GZogLZ?editors=1010" target="_blank">click event </a>
-- <a href="http://codepen.io/sebjwallace/pen/mPVpgJ?editors=1010">nav menu - events and bindings</a>
+- <a href="http://codepen.io/sebjwallace/pen/mPVpgJ?editors=1010" target="_blank">nav menu - events and bindings</a>
 
 ##### Features:
 - Variables

@@ -1,3 +1,4 @@
+import * as Types from './Types/Module';
 
 export class Compiler{
 	constructor(Store){
@@ -6,47 +7,25 @@ export class Compiler{
 	isMediaQuery(check){
 		return check.match(/\@media/);
 	}
-	isEvent(check){
-		return check.match(/^\@event\s+[^]+$/);
-	}
-	isBind(check){
-		return check.match(/^\@bind\s+[^]+$/);
-	}
-	isExtend(check){
-		return check.match(/^\@extend($|[0-9])/);
-	}
 	isVariableScope(check){
 		return check.match(/^\$/);
-	}
-	isVariable(check){
-		if(typeof check != 'string')
-			return false;
-		return check.match(/^\$[a-z,A-Z]+$/);
-	}
-	isMixin(check){
-		return check.match(/^\@mixin\s/);
-	}
-	isNesting(check){
-		return check.match(/^\>[^]/);
-	}
-	isGrouping(check){
-		return check.match(/^\#\s[a-z,A-Z]+$/);
 	}
 	generateSelector(selector,scope){
 		let children = '';
 		const check = selector.match(/^[^\s]+/)[0];
 		const postfixes = selector.replace(/^[^\s]+/,'');
-		if (this.Store.styles[check])
-			for(const child in this.Store.styles[check].children){
+		const style = this.Store.getStyle(check);
+		if (style)
+			for(const child in style.children){
 					children += child.replace('&',' ') + ' ' + postfixes + ', ';
 			}
 		return (children + ' ' + '.' + scope + ' ' + selector)
 			.replace(/\s+\:/,':')
 			.replace('BASE','');
 	}
-	generateValue(value,scope,selector,attr){
-		if(this.isVariable(value))
-			return this.Store.variables[value];
+	generateValue(value){
+		if(Types.Variable.isVariable(value))
+			return this.Store.getVariable(value);
 		else return value;
 	}
 
@@ -66,31 +45,34 @@ export class Compiler{
 
 			for(const props in obj){
 
-				if(this.isVariableScope(props) || this.isEvent(props) || this.isBind(props)) continue;
+				if( this.isVariableScope(props)
+					|| Types.Event.isEvent(props)
+					|| Types.Binding.isBinding(props)
+					|| Types.Extend.isExtend(props)
+				) continue;
 
 				if(level == 1 && !this.isMediaQuery(props)){
 					parentID = props;
 					parentOBJ = obj[props];
 				}
 
-				if(this.isMixin(props)){
-					const mixin = this.Store.mixins[props.replace('@mixin ','')];
+				if(Types.Mixin.isMixin(props)){
+					const mixin = this.Store.getMixin(Types.Mixin.format(props));
 					if(typeof obj[props] == 'string')
 						stitch( mixin(obj[props]) );
 					else if(Array.isArray(obj[props]))
 						stitch( mixin.apply(this,obj[props]) );
 					else continue;
 				}
-				else if(this.isGrouping(props)){
-					groupingID = props.replace('# ','') + '-';
-					stitch(obj[props]);
+				else if(Types.Group.isGroup(props)){
+					groupingID = Types.Group.format(props);
+						stitch(obj[props]);
 					groupingID = '';
 				}
-				else if (this.isNesting(props)){
-					const item = { [parentID + " " + props.replace('> ','')] : obj[props] };
+				else if (Types.Nesting.isNesting(props)){
+					const item = { [parentID + " " + Types.Nesting.format(props)] : obj[props] };
 					stack.push(item);
 				}
-				else if(this.isExtend(props)) continue;
 				else{
 					if(typeof obj[props] === 'object'){
 						if(this.isMediaQuery(props))

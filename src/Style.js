@@ -7,4 +7,13 @@ export class Style{
 		this.parents = {};
 		this.children = {};
 	}
+	addChild(signature){
+		this.children[signature] = true;
+	}
+	addParent(selector){
+		this.parents[selector] = selector;
+	}
+	getChildren(){
+		return this.children;
+	}
 }
