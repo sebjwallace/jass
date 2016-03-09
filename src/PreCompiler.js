@@ -29,8 +29,10 @@ export class PreCompiler{
 						const parent = this.Store.getStyle(obj[prop]);
 						if(parent){
 							activeStyle.addParent(obj[prop]);
-							parent.addChild('.' + activeStyle.token + '&' + activeStyle.selector);
-							this.Store.addToRenderStack(parent.token);
+							const signature = '.' + activeStyle.token + '&' + activeStyle.selector;
+							if(!parent.hasChild(signature))
+								parent.addChild(signature);
+								this.Store.addToRenderStack(parent.token);
 						}
 					}
 

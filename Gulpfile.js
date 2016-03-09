@@ -7,9 +7,9 @@ var source = require('vinyl-source-stream');
 
 var gulp = require('gulp');
 var babel = require('gulp-babel');
- 
+
 gulp.task('lib', function() {
-    return gulp.src('src/*.js')
+    return gulp.src('src/**/*.js')
         .pipe(babel({
             presets: ['es2015']
         }))

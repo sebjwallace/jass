@@ -23,10 +23,13 @@ export class Compiler{
 			.replace(/\s+\:/,':')
 			.replace('BASE','');
 	}
-	generateValue(value){
-		if(Types.Variable.isVariable(value))
-			return this.Store.getVariable(value);
-		else return value;
+	generateValue(isString){
+		const variable = Types.Variable.retrieve(isString);
+		if(variable){
+				const value = this.Store.getVariable(variable);
+				return isString.replace(variable,value);
+		}
+		else return isString;
 	}
 
 	parse(obj,scope){

@@ -37,8 +37,8 @@ export class Component{
 	getStyleTag(){
 		return this.tag.getTag();
 	}
-	getScope(){
-		return '.' + this.token.key;
+	scope(){
+		return '.' + this.token.key + ' ';
 	}
 	className(){
 		return this.token.key;

@@ -48,8 +48,12 @@ var Compiler = (function () {
 		}
 	}, {
 		key: 'generateValue',
-		value: function generateValue(value) {
-			if (Types.Variable.isVariable(value)) return this.Store.getVariable(value);else return value;
+		value: function generateValue(isString) {
+			var variable = Types.Variable.retrieve(isString);
+			if (variable) {
+				var value = this.Store.getVariable(variable);
+				return isString.replace(variable, value);
+			} else return isString;
 		}
 	}, {
 		key: 'parse',
@@ -184,9 +188,9 @@ var Component = (function () {
 			return this.tag.getTag();
 		}
 	}, {
-		key: 'getScope',
-		value: function getScope() {
-			return '.' + this.token.key;
+		key: 'scope',
+		value: function scope() {
+			return '.' + this.token.key + ' ';
 		}
 	}, {
 		key: 'className',
@@ -253,7 +257,8 @@ var PreCompiler = (function () {
 						var _parent = _this.Store.getStyle(obj[prop]);
 						if (_parent) {
 							activeStyle.addParent(obj[prop]);
-							_parent.addChild('.' + activeStyle.token + '&' + activeStyle.selector);
+							var signature = '.' + activeStyle.token + '&' + activeStyle.selector;
+							if (!_parent.hasChild(signature)) _parent.addChild(signature);
 							_this.Store.addToRenderStack(_parent.token);
 						}
 					} else if (Types.Variable.isVariable(prop)) {
@@ -456,6 +461,11 @@ var Style = (function () {
 		value: function getChildren() {
 			return this.children;
 		}
+	}, {
+		key: "hasChild",
+		value: function hasChild(signature) {
+			return this.children[signature];
+		}
 	}]);
 
 	return Style;
@@ -486,7 +496,7 @@ var StyleSheet = (function () {
 		value: function set(obj) {
 			if (!this.styles) this.styles = obj;else {
 				for (var selector in obj) {
-					for (var attr in obj[selector]) {
+					if (!this.styles[selector]) this.styles[selector] = obj[selector];else for (var attr in obj[selector]) {
 						var existing = this.styles[selector][attr];
 						var override = obj[selector][attr];
 						if (Array.isArray(override)) {
@@ -861,8 +871,15 @@ var Variable = (function () {
 		key: 'isVariable',
 		value: function isVariable(check) {
 			if (typeof check != 'string') return false;
-			if (check.match(/^\$[a-z,A-Z]+$/)) return true;
+			if (check.match(/^\$[a-z,A-Z,-]+$/)) return true;
 			return false;
+		}
+	}, {
+		key: 'retrieve',
+		value: function retrieve(isString) {
+			if (typeof isString != 'string') return false;
+			var match = isString.match(/\$[a-z,A-Z,-]+/);
+			if (match) return match[0];
 		}
 	}]);
 

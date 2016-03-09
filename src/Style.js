@@ -16,4 +16,7 @@ export class Style{
 	getChildren(){
 		return this.children;
 	}
+	hasChild(signature){
+		return this.children[signature];
+	}
 }

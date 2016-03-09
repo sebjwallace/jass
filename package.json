@@ -1,6 +1,6 @@
 {
   "name": "rss-js",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Reactive StyleSheets",
   "main": "lib/RSS.js",
   "scripts": {

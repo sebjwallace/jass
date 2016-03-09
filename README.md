@@ -1,7 +1,7 @@
 
 ![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
 ---
-"# rss" 
+"# rss"
 #### SASS in the JS environment, super dynamic CSS!
 
 ##### Codepen examples:
@@ -30,7 +30,7 @@ With the rise of component-based architecture in website & application developme
 ##### How?
 Simply include RSS, instantiate a RSS.Component, and use the Component instance method setStyles({ /* styles declared as object literal */ }). All of the API is inside the setStyles method using object literal syntax. The only additional (and optional) method is RSS.Event().
 
-Explore the Codepen exmaples and the ones below for more detail.
+Explore the Codepen exmaples and the ones above for more detail.
 
 The following examples will use React to demonstrate RSS features, although RSS could be used with any Framework, or simply using vanilla Javascript.
 
@@ -71,16 +71,19 @@ class MessageBox{
         'background-color': 'rgba(40,80,255)'
       }
     });
+    // if there are global styles that might override the ids and classes
+    // in the component just prepend them with the component scope
+    const $ = this.styles.scope();
     return (
-      <div className={this.styles.className()}> // this div has the optional BASE class
-        <div id="title"> { this.props.title } </div>
-        <div id="body"> { this.props.children } </div>
+      <div className={ $ }> // assign the base scope to the component root element
+        <div id={ $+"title" }> { this.props.title } </div>
+        <div id={ $+"body" }> { this.props.children } </div>
       </div>
     )
   }
 }
 ```
-Every selector defined in a component is scoped only to the component. If the id of '#title' was used anywhere outside the component, it will not conflict with the one defined in the component.
+Every style defined in a component is scoped only to the component - they will not leak out and affect anything outside of the component. If the id of '#title' is used anywhere outside the component, it will not be overridden by the styles defined in the component. On the flip-side, to ensure protection of the elements with ids/classes within the component, prepend them with the component scope as shown above. This is optional if there are no global styles that could leak in.
 
 ###### Nesting
 
@@ -105,7 +108,7 @@ Keeping within the same example, now giving the '#body' some nested and grouped 
 }
 ```
 
-To nest just prefix the selector with '> ', and to group just prefix '# '.
+To nest just prefix the selector with '> ', and to group just prefix '# '. Notice there is a space required between the token and the selector '> selector', '# selector'.
 
 ###### Inheritance
 
@@ -205,8 +208,8 @@ The local Javascript variables are useful when reacting to state change:
 ```javascript
 class MessageBox{
   constructor(){
-  	this.styles = new RSS.Component();
-  	this.state = { visibility: 'block' }
+    this.state = { visibility: 'block' }
+  	this.styles = new RSS.Component({ /* optional: set some initial styles here */ });
   }
   handleClick(){
   	this.state.visibile = 'hidden'
@@ -227,6 +230,21 @@ class MessageBox{
 }
 ```
 
+The setStyles() / this.styles.set() method can be used multiple times within the component. A case where this might be useful is when declaring multiple selectors with their own local variables - for the sake of more readable code.
+
+Somewhere within the render method:
+```javascript
+const boxSize = 50;
+this.styles.set({
+  '.box': { height: boxSize + 'px', width: (boxSize / 2) + 'px' }
+})
+
+const messageSize = 200;
+this.styles.set({
+  '.message': { height: messageSize + 'px', width: (messageSize * 4) + 'px' }
+})
+```
+
 ###### Events
 
 Styles can be modified on events within the project. All that's needed is a listener and a trigger. The listener is defined within a selector, and a trigger is used anywhere within the project where the RSS object is available.
@@ -244,7 +262,7 @@ render(){
       // ...
     });
     return (
-      <div className={this.styles.className()} onClick={this.handleClick}>
+      <div className={this.styles.className()}>
         // ...
         // the trigger is bound to the click event
         <button onClick={ RSS.Event('hide') }>Hide</button>
@@ -300,3 +318,5 @@ this.styles.set({
 	}
 });
 ```
+
+Giving CSS a new home inside Javascript can be very beneficial for all of us, so any contributions to improve or extend the current codebase are very welcome!
