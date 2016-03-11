@@ -20,7 +20,7 @@
 		    <h1>RSS</h1>
 		    <h3>Reactive Style Sheets</h3>
 		  </div>
-		  <button>Hide</button>
+		  <button id="hide-button">Hide</button>
 		  <a href="https://github.com/sebjwallace/RSS">github</a>
 		</div>
 
@@ -70,6 +70,9 @@
 			    '@mixin rounded-corners': '10px',
 			    '@mixin links' : ['red','green','blue','gray'],
 			    '@extend': '.padded',
+			    opacity: 1,
+			    '@event hide': { opacity: 0 },
+			    'transition': 'opacity 1s',
 			    'font-family': '$font',
 			    '> #heading': { 'color': '#222' },
 			    '> ul': {
@@ -78,6 +81,9 @@
 			        padding: '2px',
 			      }
 			    }
+			  },
+			  '#hide-button': {
+			  	'@bind onclick': '@event hide' 
 			  }
 			});
 

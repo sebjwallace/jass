@@ -5,7 +5,7 @@ import { Tag } from './Tag';
 import { StyleSheet } from './StyleSheet';
 
 class ComponentFactory{
-	constructor(el,styles){
+	constructor(initial,styles){
 		const Store = RSS.Store,
 		token = new Token(),
 		tag = new Tag(token.key,document),

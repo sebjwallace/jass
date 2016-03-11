@@ -312,7 +312,7 @@ var _Tag = require('./Tag');
 
 var _StyleSheet = require('./StyleSheet');
 
-var ComponentFactory = function ComponentFactory(el, styles) {
+var ComponentFactory = function ComponentFactory(initial, styles) {
 	_classCallCheck(this, ComponentFactory);
 
 	var Store = RSS.Store,
@@ -514,7 +514,7 @@ var StyleSheet = (function () {
 		value: function set(obj) {
 			if (!this.styles) this.styles = obj;else {
 				for (var selector in obj) {
-					if (!this.styles[selector]) this.styles[selector] = obj[selector];else for (var attr in obj[selector]) {
+					for (var attr in obj[selector]) {
 						var existing = this.styles[selector][attr];
 						var override = obj[selector][attr];
 						if (Array.isArray(override)) {
