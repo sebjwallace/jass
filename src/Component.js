@@ -1,18 +1,13 @@
-import { Token } from './Token';
-import { Tag } from './Tag';
 import { Compiler } from './Compiler';
 import { PreCompiler } from './PreCompiler';
-import { StyleSheet } from './StyleSheet';
 
 export class Component{
-	constructor(Store,styles){
-		this.token = new Token;
-		this.tag = new Tag(this.token.key);
-		this.stylesheet = new StyleSheet;
-
+	constructor({Store,token,tag,stylesheet,styles}){
+		this.token = token;
+		this.tag = tag;
+		this.stylesheet = stylesheet;
 		this.Store = Store;
 		this.Store.registerTag(this.token.key,this.tag);
-		if (styles) this.setStyles(styles);
 	}
 	setStyles(obj){
 		this.stylesheet.set(obj);
@@ -36,6 +31,9 @@ export class Component{
 	}
 	getStyleTag(){
 		return this.tag.getTag();
+	}
+	remove(){
+		this.tag.remove();
 	}
 	scope(){
 		return '.' + this.token.key + ' ';

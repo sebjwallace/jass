@@ -1,15 +1,27 @@
 import { Component as _Component } from './Component';
 import { Store } from './Store';
+import { Token } from './Token';
+import { Tag } from './Tag';
+import { StyleSheet } from './StyleSheet';
 
-class ComponentFacade{
-	constructor(initial,styles){
-		const comp = new _Component(RSS.Store);
+class ComponentFactory{
+	constructor(el,styles){
+		const Store = RSS.Store,
+		token = new Token(),
+		tag = new Tag(token.key,document),
+		stylesheet = new StyleSheet
+
+		const comp = new _Component({
+			Store, token, tag, stylesheet
+		});
+
 		if(typeof initial == 'string')
 			document.getElementById(initial).className = comp.className();
 		else if(typeof initial == 'object')
 			comp.setStyles(initial);
 		if(styles)
 			comp.setStyles(styles);
+
 		return comp;
 	}
 }
@@ -28,7 +40,7 @@ const _Event = (id) => {
 class _RSS{
 	constructor(store){
 		this.Store = store;
-		this.Component = ComponentFacade;
+		this.Component = ComponentFactory;
 		this.Event = _Event;
 		if(!document.getElementById('rss-container')){
 			let el = document.createElement('div');
@@ -39,5 +51,5 @@ class _RSS{
 }
 
 export const RSS = new _RSS(new Store);
-export const Component = ComponentFacade;
+export const Component = ComponentFactory;
 export const Event = _Event;

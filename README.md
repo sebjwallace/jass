@@ -2,7 +2,7 @@
 ![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
 ---
 "# rss"
-#### SASS in the JS environment, super dynamic CSS!
+#### Expressive CSS in the JS environment!
 
 ##### Codepen examples:
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
@@ -117,7 +117,7 @@ The links in the body might have several states: hover, visited, active. And the
 ```javascript
 // global parent selectors, mixins and variables are usually kept in separate files. In this case we keep them in separate abstract RSS components (which too can be kept in separate files, if they preceed the components that consume them)
 
-let parentSelectors = new RSS.Component({
+const parentSelectors = new RSS.Component({
   '.links': {
     '> a': {
       color: '#73DED7',
@@ -150,7 +150,7 @@ Because the styles are reactive, if values in the parent selector changes then a
 If the Message component were to have rounded corners it would also need vendor prefixes. Mixins are useful because they accept inputs that determine the output.
 
 ```javascript
-let mixins = new RSS.Component({
+const mixins = new RSS.Component({
   '@mixin rounded-corners': function(radius){
     return {
       '-webkit-border-radius': radius,
@@ -319,4 +319,4 @@ this.styles.set({
 });
 ```
 
-Giving CSS a new home inside Javascript can be very beneficial for all of us, so any contributions to improve or extend the current codebase are very welcome!
+Forks are welcome!

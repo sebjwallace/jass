@@ -5,7 +5,7 @@ export class Compiler{
 		this.Store = Store;
 	}
 	isMediaQuery(check){
-		return check.match(/\@media/);
+		return check.match(/\@media\s+/);
 	}
 	isVariableScope(check){
 		return check.match(/^\$/);

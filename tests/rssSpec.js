@@ -1,17 +1,20 @@
 
 describe('RSS', function(){
 
-	var component = new RSS.Component();
-
 	it('gets instantiated', function(){
+		var component = new RSS.Component();
 		expect(component).toBeDefined();
+		component.remove();
 	});
 
 	it('appends a rss-container to the document.body', function(){
+		var component = new RSS.Component();
 		expect(document.getElementById('rss-container')).not.toBe(null);
+		component.remove();
 	});
 
 	it('accepts an object literal of styles', function(){
+		var component = new RSS.Component();
 		component.setStyles({
 			'#my-id': {
 				color: 'brown',
@@ -20,9 +23,11 @@ describe('RSS', function(){
 		});
 		expect(component.getStyleTag().innerHTML)
 			.toContain('#my-id{color:brown;font-size:1em;}');
+		component.remove();
 	});
 
 	it('accepts nestings', function(){
+		var component = new RSS.Component();
 		component.setStyles({
 			'#my-id': {
 				color: 'brown',
@@ -33,9 +38,11 @@ describe('RSS', function(){
 		});
 		expect(component.getStyleTag().innerHTML).toContain("#my-id{color:brown;}");
 		expect(component.getStyleTag().innerHTML).toContain("#my-id i{color:gray;}");
+		component.remove();
 	});
 
 	it('accepts mixins', function(){
+		var component = new RSS.Component();
 		component.setStyles({
 			'mixins':{
 				'@mixin rounded-corners': function(radius){
@@ -54,58 +61,58 @@ describe('RSS', function(){
 		});
 		expect(component.getStyleTag().innerHTML)
 			.toContain('.message{background-color:gray;-webkit-border-radius:5px;-moz-border-radius:5px;-ms-border-radius:5px;border-radius:5px;}')
+		component.remove();
 	});
 
 	it('accepts inheritance', function(){
+		var component = new RSS.Component();
 		var parentComponent = new RSS.Component();
 		parentComponent.setStyles({
-			'.btn': {
-				'border': '1px solid aqua'
-			}
-		});
-		component.setStyles({
-			'.submit-btn': {
-				'@extend': '.btn',
-				'font-size': '1.8em'
-			}
-		});
-		expect(parentComponent.getStyleTag().innerHTML)
-			.toContain(
-				component.getScope() + " .submit-btn ,  "
-				+ parentComponent.getScope() + " .btn{border:1px solid aqua;}"
-			)
-	});
-
-	it('accepts multiple inheritance', function(){
-		var parentComponent = new RSS.Component();
-		var anotherParentComponent = new RSS.Component();
-		parentComponent.setStyles({
-			'.parentA': {
-				'border': '1px solid aqua'
-			}
-		});
-		anotherParentComponent.setStyles({
-			'.parentB': {
-				'padding': '40px'
+			'.parent': {
+				color:'aqua'
 			}
 		});
 		component.setStyles({
 			'.child': {
-				'@extend': '.parentA',
-				'@extend1': '.parentB',
+				'@extend': '.parent',
 				'font-size': '1.8em'
 			}
 		});
-		expect(anotherParentComponent.getStyleTag().innerHTML)
-			.toContain(
-				component.getScope() + " .child ,  "
-				+ anotherParentComponent.getScope() + " .parentB{padding:40px;}"
-			);
-		expect(parentComponent.getStyleTag().innerHTML)
-			.toContain(
-				component.getScope() + " .child ,  "
-				+ parentComponent.getScope() + " .parentA{border:1px solid aqua;}"
-			);
+		const reducedWhiteSpace = parentComponent.getStyleTag().innerHTML.replace(/\s+/g,'');
+		const expectReduced = (component.scope() + ".child,"
+						+ parentComponent.scope() + ".parent{color:aqua;}").replace(/\s+/g,'');
+
+		expect(reducedWhiteSpace).toContain(expectReduced);
+		parentComponent.remove();
+		component.remove();
+	});
+
+	it('accepts multiple inheritance', function(){
+		var component = new RSS.Component();
+		var parentComponent = new RSS.Component();
+		var anotherParentComponent = new RSS.Component();
+		parentComponent.setStyles({ '.parentA': { color:'aqua' } });
+		anotherParentComponent.setStyles({ '.parentB': { height:'100px' } });
+		component.setStyles({
+			'.child': {
+				'@extend': '.parentA',
+				'@extend1': '.parentB',
+				'font-size': '1em'
+			}
+		});
+		const reducedWhiteSpaceA = parentComponent.getStyleTag().innerHTML.replace(/\s+/g,'');
+		const expectReducedA = (component.scope() + ".child,"
+						+ parentComponent.scope() + ".parentA{color:aqua;}").replace(/\s+/g,'');
+		expect(reducedWhiteSpaceA).toContain(expectReducedA);
+
+		const reducedWhiteSpaceB = anotherParentComponent.getStyleTag().innerHTML.replace(/\s+/g,'');
+		const expectReducedB = (component.scope() + ".child,"
+						+ anotherParentComponent.scope() + ".parentB{height:100px;}").replace(/\s+/g,'');
+		expect(reducedWhiteSpaceB).toContain(expectReducedB);
+
+		// parentComponent.remove();
+		// anotherParentComponent.remove();
+		// component.remove();
 	});
 
 });

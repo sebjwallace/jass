@@ -27,7 +27,7 @@ var Compiler = (function () {
 	_createClass(Compiler, [{
 		key: 'isMediaQuery',
 		value: function isMediaQuery(check) {
-			return check.match(/\@media/);
+			return check.match(/\@media\s+/);
 		}
 	}, {
 		key: 'isVariableScope',
@@ -135,27 +135,25 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Token = require('./Token');
-
-var _Tag = require('./Tag');
-
 var _Compiler = require('./Compiler');
 
 var _PreCompiler = require('./PreCompiler');
 
-var _StyleSheet = require('./StyleSheet');
-
 var Component = (function () {
-	function Component(Store, styles) {
+	function Component(_ref) {
+		var Store = _ref.Store;
+		var token = _ref.token;
+		var tag = _ref.tag;
+		var stylesheet = _ref.stylesheet;
+		var styles = _ref.styles;
+
 		_classCallCheck(this, Component);
 
-		this.token = new _Token.Token();
-		this.tag = new _Tag.Tag(this.token.key);
-		this.stylesheet = new _StyleSheet.StyleSheet();
-
+		this.token = token;
+		this.tag = tag;
+		this.stylesheet = stylesheet;
 		this.Store = Store;
 		this.Store.registerTag(this.token.key, this.tag);
-		if (styles) this.setStyles(styles);
 	}
 
 	_createClass(Component, [{
@@ -188,6 +186,11 @@ var Component = (function () {
 			return this.tag.getTag();
 		}
 	}, {
+		key: 'remove',
+		value: function remove() {
+			this.tag.remove();
+		}
+	}, {
 		key: 'scope',
 		value: function scope() {
 			return '.' + this.token.key + ' ';
@@ -204,7 +207,7 @@ var Component = (function () {
 
 exports.Component = Component;
 
-},{"./Compiler":1,"./PreCompiler":3,"./StyleSheet":7,"./Tag":8,"./Token":9}],3:[function(require,module,exports){
+},{"./Compiler":1,"./PreCompiler":3}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -303,12 +306,27 @@ var _Component2 = require('./Component');
 
 var _Store = require('./Store');
 
-var ComponentFacade = function ComponentFacade(initial, styles) {
-	_classCallCheck(this, ComponentFacade);
+var _Token = require('./Token');
 
-	var comp = new _Component2.Component(RSS.Store);
+var _Tag = require('./Tag');
+
+var _StyleSheet = require('./StyleSheet');
+
+var ComponentFactory = function ComponentFactory(el, styles) {
+	_classCallCheck(this, ComponentFactory);
+
+	var Store = RSS.Store,
+	    token = new _Token.Token(),
+	    tag = new _Tag.Tag(token.key, document),
+	    stylesheet = new _StyleSheet.StyleSheet();
+
+	var comp = new _Component2.Component({
+		Store: Store, token: token, tag: tag, stylesheet: stylesheet
+	});
+
 	if (typeof initial == 'string') document.getElementById(initial).className = comp.className();else if (typeof initial == 'object') comp.setStyles(initial);
 	if (styles) comp.setStyles(styles);
+
 	return comp;
 };
 
@@ -327,7 +345,7 @@ var _RSS = function _RSS(store) {
 	_classCallCheck(this, _RSS);
 
 	this.Store = store;
-	this.Component = ComponentFacade;
+	this.Component = ComponentFactory;
 	this.Event = _Event;
 	if (!document.getElementById('rss-container')) {
 		var el = document.createElement('div');
@@ -338,12 +356,12 @@ var _RSS = function _RSS(store) {
 
 var RSS = new _RSS(new _Store.Store());
 exports.RSS = RSS;
-var Component = ComponentFacade;
+var Component = ComponentFactory;
 exports.Component = Component;
 var Event = _Event;
 exports.Event = Event;
 
-},{"./Component":2,"./Store":5}],5:[function(require,module,exports){
+},{"./Component":2,"./Store":5,"./StyleSheet":7,"./Tag":8,"./Token":9}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -532,20 +550,28 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var Tag = (function () {
-	function Tag(id) {
+	function Tag(id, document) {
 		_classCallCheck(this, Tag);
 
-		this.tag = this.generateTag('rss-' + id);
+		this.document = document;
+		this.id = 'rss-' + id;
+		this.tag = this.generateTag(this.id);
 	}
 
 	_createClass(Tag, [{
 		key: 'generateTag',
 		value: function generateTag(id) {
-			var el = document.createElement('style');
+			var el = this.document.createElement('style');
 			el.id = id;
-			var container = document.getElementById('rss-container');
+			var container = this.document.getElementById('rss-container');
 			container.appendChild(el);
 			return el;
+		}
+	}, {
+		key: 'remove',
+		value: function remove() {
+			var el = this.document.getElementById(this.id);
+			el.parentNode.removeChild(el);
 		}
 	}, {
 		key: 'getTag',
