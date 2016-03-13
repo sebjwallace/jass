@@ -17,22 +17,22 @@ gulp.task('lib', function() {
 });
 
 gulp.task('dev', function() {
-  return browserify('./src/RSS.js',{
-        standalone: 'RSS'
+  return browserify('./src/JASS.js',{
+        standalone: 'JASS'
     })
     .transform(babelify)
     .bundle()
-    .pipe(source('rss.js'))
+    .pipe(source('jass.js'))
     .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('dist', function() {
-  return browserify('./src/RSS.js',{
-        standalone: 'RSS'
+  return browserify('./src/JASS.js',{
+        standalone: 'JASS'
     })
     .transform(babelify)
     .bundle()
-    .pipe(source('rss.min.js'))
+    .pipe(source('jass.min.js'))
     .pipe(buffer())
     .pipe(uglify())
     .pipe(gulp.dest('./dist'));

@@ -1,20 +1,20 @@
 
-describe('RSS', function(){
+describe('JASS', function(){
 
 	it('gets instantiated', function(){
-		var component = new RSS.Component();
+		var component = new JASS.Component();
 		expect(component).toBeDefined();
 		component.remove();
 	});
 
-	it('appends a rss-container to the document.body', function(){
-		var component = new RSS.Component();
+	it('appends a JASS-container to the document.body', function(){
+		var component = new JASS.Component();
 		expect(document.getElementById('rss-container')).not.toBe(null);
 		component.remove();
 	});
 
 	it('accepts an object literal of styles', function(){
-		var component = new RSS.Component();
+		var component = new JASS.Component();
 		component.setStyles({
 			'#my-id': {
 				color: 'brown',
@@ -27,7 +27,7 @@ describe('RSS', function(){
 	});
 
 	it('accepts nestings', function(){
-		var component = new RSS.Component();
+		var component = new JASS.Component();
 		component.setStyles({
 			'#my-id': {
 				color: 'brown',
@@ -42,7 +42,7 @@ describe('RSS', function(){
 	});
 
 	it('accepts mixins', function(){
-		var component = new RSS.Component();
+		var component = new JASS.Component();
 		component.setStyles({
 			'mixins':{
 				'@mixin rounded-corners': function(radius){
@@ -65,8 +65,8 @@ describe('RSS', function(){
 	});
 
 	it('accepts inheritance', function(){
-		var component = new RSS.Component();
-		var parentComponent = new RSS.Component();
+		var component = new JASS.Component();
+		var parentComponent = new JASS.Component();
 		parentComponent.setStyles({
 			'.parent': {
 				color:'aqua'
@@ -88,9 +88,9 @@ describe('RSS', function(){
 	});
 
 	it('accepts multiple inheritance', function(){
-		var component = new RSS.Component();
-		var parentComponent = new RSS.Component();
-		var anotherParentComponent = new RSS.Component();
+		var component = new JASS.Component();
+		var parentComponent = new JASS.Component();
+		var anotherParentComponent = new JASS.Component();
 		parentComponent.setStyles({ '.parentA': { color:'aqua' } });
 		anotherParentComponent.setStyles({ '.parentB': { height:'100px' } });
 		component.setStyles({

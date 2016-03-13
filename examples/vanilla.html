@@ -11,20 +11,20 @@
 
 		<!--
 		 A very quick example to show how to use
-		RSS in a vanilla setup
+		JASS in a vanilla setup
 		-->
 
 		<!-- a component -->
 		<div id="root">
 		  <div id="content">
-		    <h1>RSS</h1>
+		    <h1>JASS</h1>
 		    <h3>Reactive Style Sheets</h3>
 		  </div>
 		  <button id="hide-button">Hide</button>
-		  <a href="https://github.com/sebjwallace/RSS">github</a>
+		  <a href="https://github.com/sebjwallace/JASS">github</a>
 		</div>
 
-		<script type="text/javascript" src="../dist/rss.js"></script>
+		<script type="text/javascript" src="../dist/JASS.js"></script>
 
 		<script type="text/javascript">
 
@@ -32,7 +32,7 @@
 			// mixins & parent selectors
 			// go into a globals component
 
-			var globals = new RSS.Component({
+			var globals = new JASS.Component({
 			  $font: 'consolas', // variable
 			  $basePadding: '10px',
 			  '@mixin rounded-corners': function(radius){ // mixin
@@ -56,11 +56,11 @@
 			  '.padded': { padding: '10px' }
 			});
 
-			var rootStyles = new RSS.Component();
+			var rootStyles = new JASS.Component();
 			var root = document.getElementById('root');
 
 			// the root level of the component must use
-			// the base class used in the RSS component
+			// the base class used in the JASS component
 			root.className = rootStyles.className();
 
 			rootStyles.setStyles({
@@ -83,7 +83,7 @@
 			    }
 			  },
 			  '#hide-button': {
-			  	'@bind onclick': '@event hide' 
+			  	'@bind onclick': '@event hide'
 			  }
 			});
 

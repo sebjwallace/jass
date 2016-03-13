@@ -1,4 +1,3 @@
-import { RSS } from './RSS';
 import * as Types from './Types/Module';
 
 export class PreCompiler{
@@ -21,7 +20,7 @@ export class PreCompiler{
 					selector = prop;
 					this.Store.addStyle(key, selector, obj[selector]);
 					activeStyle = this.Store.getStyle(selector);
-					this.Store.registerToken(key,activeStyle.selector,activeStyle);	
+					this.Store.registerToken(key,activeStyle.selector,activeStyle);
 					this.Store.registerStyle(key,activeStyle.selector,activeStyle.body);
 				}
 

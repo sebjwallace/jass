@@ -51,5 +51,6 @@ class _RSS{
 }
 
 export const RSS = new _RSS(new Store);
+export const JASS = new _RSS(new Store);
 export const Component = ComponentFactory;
 export const Event = _Event;

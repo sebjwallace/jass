@@ -1,3 +1,5 @@
+import { JASS } from '../JASS';
+
 export class Binding{
 	constructor(selector,key,name,fn){
 		this.el = null;
@@ -10,7 +12,7 @@ export class Binding{
 	createEvent(fn){
 		if(typeof fn == 'string'){
 			const eventId = fn.replace(/^\@event\s+/,'');
-			this.fn = () => { RSS.Event(eventId); };
+			this.fn = () => { JASS.Event(eventId); };
 		}
 		else this.fn = fn;
 		this.el[this.domEvent] = this.fn;

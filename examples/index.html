@@ -14,11 +14,11 @@
 		<script src="https://fb.me/react-0.13.3.js"></script>
     	<script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
 
-		<script type="text/javascript" src="../dist/rss.js"></script>
+		<script type="text/javascript" src="../dist/JASS.js"></script>
 
 		<script type="text/jsx">
 
-			var globals = new RSS.Component({
+			var globals = new JASS.Component({
 				$inputColor: 'rgba(255,255,255,0.5)',
 				'@mixin width-center': function(width){
 					return {
@@ -50,7 +50,7 @@
 
 			var MainBox = React.createClass({
 				componentWillMount: function(){
-					this.styles = new RSS.Component();
+					this.styles = new JASS.Component();
 					this.setState({ width: this.props.width });
 					this.setState({ color: this.props.color });
 				},
