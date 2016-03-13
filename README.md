@@ -1,7 +1,5 @@
 
-![logo](https://raw.githubusercontent.com/sebjwallace/rss/master/logo500.png)
----
-"# rss"
+"# jass"
 #### Expressive CSS in the JS environment!
 
 ##### Codepen examples:
@@ -17,48 +15,47 @@
 - Nesting / Grouping
 - Media Queries
 
-###### RSS-Specific Features
 - Events
 - Bindings
 
 ##### What?
-RSS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles. Just use the CSS syntax you're familiar with but using object literals.
+JASS gives the developer the ability to declare and modify CSS at runtime using emulated core features of SASS - essentially giving CSS a powerful Javascript interface. This removes the need to manipulate CSS directly through the DOM or use inline styles. Just use the CSS syntax you're familiar with but using object literals.
 
 ##### Why?
-With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS emulated ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty. With RSS, CSS can react to events, eliminating tedious bloat code.
+With the rise of component-based architecture in website & application development, the need to encapsulate CSS into components is becoming more apparent. With the major features of SASS emulated ontop of regular CSS inside of (React/Angular) components, you can gain greater control and flexibilty. With JASS, CSS can react to events, eliminating tedious bloat code.
 
 ##### How?
-Simply include RSS, instantiate a RSS.Component, and use the Component instance method setStyles({ /* styles declared as object literal */ }). All of the API is inside the setStyles method using object literal syntax. The only additional (and optional) method is RSS.Event().
+Simply include JASS, instantiate a JASS.Component, and use the Component instance method setStyles({ /* styles declared as object literal */ }). All of the API is inside the setStyles method using object literal syntax. The only additional (and optional) method is JASS.Event().
 
 Explore the Codepen exmaples and the ones above for more detail.
 
-The following examples will use React to demonstrate RSS features, although RSS could be used with any Framework, or simply using vanilla Javascript.
+The following examples will use React to demonstrate JASS features, although JASS could be used with any Framework, or simply using vanilla Javascript.
 
 Include via stript tag
 ```html
-  <script src="path.../dist/rss.js"></script>
+  <script src="path.../dist/jass.js"></script>
 ```
 
-<a href="https://www.npmjs.com/package/rss-js">NPM | rss-js</a>
+<a href="https://www.npmjs.com/package/jass-js">NPM | jass-js</a>
 
 Include via Browserify or ES6
 ```javascript
 // browserify
-const RSS = require('rss-js');
+const JASS = require('jass-js');
 // es6
-import { RSS } from 'rss-js';
+import { JASS } from 'jass-js';
 ```
 
 Instantiate:
 ```javascript
-const component = new RSS.Component();
+const component = new JASS.Component();
 ```
 
 Simple component:
 ```javascript
 class MessageBox{
   constructor(){
-    this.styles = new RSS.Component();
+    this.styles = new JASS.Component();
   }
   render(){
     this.styles.set({
@@ -115,9 +112,9 @@ To nest just prefix the selector with '> ', and to group just prefix '# '. Notic
 The links in the body might have several states: hover, visited, active. And these styles might also apply to other components too - in an article component, for example. So it would be best to abstract these styles into a parent selector.
 
 ```javascript
-// global parent selectors, mixins and variables are usually kept in separate files. In this case we keep them in separate abstract RSS components (which too can be kept in separate files, if they preceed the components that consume them)
+// global parent selectors, mixins and variables are usually kept in separate files. In this case we keep them in separate abstract JASS components (which too can be kept in separate files, if they preceed the components that consume them)
 
-const parentSelectors = new RSS.Component({
+const parentSelectors = new JASS.Component({
   '.links': {
     '> a': {
       color: '#73DED7',
@@ -150,7 +147,7 @@ Because the styles are reactive, if values in the parent selector changes then a
 If the Message component were to have rounded corners it would also need vendor prefixes. Mixins are useful because they accept inputs that determine the output.
 
 ```javascript
-const mixins = new RSS.Component({
+const mixins = new JASS.Component({
   '@mixin rounded-corners': function(radius){
     return {
       '-webkit-border-radius': radius,
@@ -185,7 +182,7 @@ Unlike inheritance, mixins are not reactive. So if styles are shared but desired
 Although regular Javascript variables are useful within the local scope of the render function, variables might also need to be global so they can be used across other components, like parent selectors and mixins.
 
 ```javascript
-let variables = new RSS.Component({
+let variables = new JASS.Component({
 	$headingColor: '#4FABC9',
 	$borderRadius: '5px'
 });
@@ -209,7 +206,7 @@ The local Javascript variables are useful when reacting to state change:
 class MessageBox{
   constructor(){
     this.state = { visibility: 'block' }
-  	this.styles = new RSS.Component({ /* optional: set some initial styles here */ });
+  	this.styles = new JASS.Component({ /* optional: set some initial styles here */ });
   }
   handleClick(){
   	this.state.visibile = 'hidden'
@@ -247,7 +244,7 @@ this.styles.set({
 
 ###### Events
 
-Styles can be modified on events within the project. All that's needed is a listener and a trigger. The listener is defined within a selector, and a trigger is used anywhere within the project where the RSS object is available.
+Styles can be modified on events within the project. All that's needed is a listener and a trigger. The listener is defined within a selector, and a trigger is used anywhere within the project where the JASS object is available.
 
 ```javascript
 render(){
@@ -265,7 +262,7 @@ render(){
       <div className={this.styles.className()}>
         // ...
         // the trigger is bound to the click event
-        <button onClick={ RSS.Event('hide') }>Hide</button>
+        <button onClick={ JASS.Event('hide') }>Hide</button>
       </div>
     )
   }
@@ -298,7 +295,7 @@ A selector can do more than just listen for events, it can trigger them too. Lik
   }
 ```
 
-Bindings can be useful if RSS.Event cannot be called from HTML (like the above example for Events).
+Bindings can be useful if JASS.Event cannot be called from HTML (like the above example for Events).
 
 <a href="http://codepen.io/sebjwallace/pen/mPVpgJ?editors=1010">Example of events and bindings</a>
 
