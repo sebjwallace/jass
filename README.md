@@ -2,6 +2,8 @@
 "# jass"
 #### Expressive CSS in the JS environment!
 
+![logo](https://raw.githubusercontent.com/sebjwallace/jass/master/logo.png)
+
 ##### Codepen examples:
 - <a href="http://codepen.io/sebjwallace/pen/yOYwbN?editors=1010" target="_blank">user control styles</a>
 - <a href="http://codepen.io/sebjwallace/pen/RarbBg?editors=1010" target="_blank">vanilla HTML/JS</a>
@@ -14,7 +16,6 @@
 - Inheritance
 - Nesting / Grouping
 - Media Queries
-
 - Events
 - Bindings
 
@@ -68,13 +69,10 @@ class MessageBox{
         'background-color': 'rgba(40,80,255)'
       }
     });
-    // if there are global styles that might override the ids and classes
-    // in the component just prepend them with the component scope
-    const $ = this.styles.scope();
     return (
-      <div className={ $ }> // assign the base scope to the component root element
-        <div id={ $+"title" }> { this.props.title } </div>
-        <div id={ $+"body" }> { this.props.children } </div>
+      <div className={ this.styles.className() }> // assign the base scope to the component root element
+        <div id="title"> { this.props.title } </div>
+        <div id="body"> { this.props.children } </div>
       </div>
     )
   }

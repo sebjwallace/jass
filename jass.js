@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./dist/rss.js');
+module.exports = require('./dist/jass.js');
