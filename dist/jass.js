@@ -328,7 +328,7 @@ var PreCompiler = (function () {
 						var _parent = _this.Store.getStyle(obj[prop]);
 						if (_parent) {
 							activeStyle.addParent(obj[prop]);
-							var signature = '.' + activeStyle.token + '&' + activeStyle.selector;
+							var signature = '.' + activeStyle.token + '&' + activeStyle.selector.replace('BASE', '');
 							if (!_parent.hasChild(signature)) _parent.addChild(signature);
 							_this.Store.addToRenderStack(_parent.token);
 						}

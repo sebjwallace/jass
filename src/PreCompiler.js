@@ -28,7 +28,7 @@ export class PreCompiler{
 						const parent = this.Store.getStyle(obj[prop]);
 						if(parent){
 							activeStyle.addParent(obj[prop]);
-							const signature = '.' + activeStyle.token + '&' + activeStyle.selector;
+							const signature = '.' + activeStyle.token + '&' + activeStyle.selector.replace('BASE','');
 							if(!parent.hasChild(signature))
 								parent.addChild(signature);
 								this.Store.addToRenderStack(parent.token);
